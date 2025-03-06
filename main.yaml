@@ -1,0 +1,6 @@
+default_config:
+homeassistant: !include homeassistant.yaml
+
+http: !include http.yaml
+
+automation ui: !include automations.yaml

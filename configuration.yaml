@@ -1,0 +1,2 @@
+# This file is not the real one used by home assistant, it only exists to make the config checker work
+!include main.yaml
