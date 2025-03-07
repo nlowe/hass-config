@@ -1,0 +1,58 @@
+virtual_devices_master_bedroom:
+  input_select:
+    master_bedroom_pedestal_fan_commands:
+      name: "Broadlink Commands for Master Bedroom Pedestal Fan"
+      options:
+        - &power_toggle b64:JgCqACoNKQ4MKygMKA8NKgwoDigOKg0oDSop6CkOKA4NKSkNKA0OKQwqDSgQJw0pDCop6CkOKA4MKigOKA0OKQ0oDikMKg4oDCsn6SkOJw4NKygNJw4NKwwoDigNKg4pDCgp6SgPKA0NKSkOKA0OKgwoDSkOKQ4oDCkq6CgPKA4MKSgOKQ4NKg0oDSoNKg0oDCkp6SkOKA4MKSoMKQ4NKQ0oDikNKQ0qDCgpAA0F
+        - &oscellate_toggle b64:JgCcACoOKA4NKSgOKA4NKQ4nKQ4NKg0nDSsNAAEEKQ4oDA4qJw4pDQ0qDSknDw0pDSkNKQ4AAQQpDSgNDSsoDigNDCoOKScODygMKg0pDQABBSgOKA0NKikNKA4MKg0pKA0NKwwpDikMAAEFKQ4oDg0oKQ8oDgwpDigpDg0qDCgNKg4AAQMpDygMDSkpDikNDCoNKSgODCoNKQ0oEAANBQ==
+        - &cycle_speed JgCcACsNKQ4MKikMKA8NKgwoDSkOKg0oKA0OAAEFKQwoDwwpKg0nDg4qDCgOKA0rDSgpDA0AAQUpDigODCkqDSgODSkNKA4pDSkOKCgODQABBCkOKA4NKCoMKQ4NKQ0oDSoNKg0oKA0NAAEFKA8oDgwqKA0pDg0pDSgNKQ4qDSknDQ0AAQYoDSkOCyopDigODCoMKg0oDSoMKikMDAANBQ==
+
+  input_boolean:
+    master_bedroom_pedestal_fan_state:
+    master_bedroom_pedestal_fan_osc:
+
+  input_number:
+    master_bedroom_pedestal_fan_percentage:
+      min: 0
+      max: 100
+
+  fan:
+    - platform: template
+      fans:
+        master_bedroom_pedestal_fan:
+          friendly_name: "Master Bedroom Pedestal Fan"
+          unique_id: master_bedroom_pedestal_fan
+          value_template: "{{ states('input_boolean.master_bedroom_pedestal_fan_state') }}"
+          # percentage_template: "{{ states('input_number.master_bedroom_pedestal_fan_percentage') }}"
+          # oscillating_template: "{{ states('input_boolean.master_bedroom_pedestal_fan_osc') }}"
+          turn_on:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.master_bedroom_pedestal_fan_state
+          - action: remote.send_command
+            target:
+              entity_id: remote.master_bedroom_ir_controller
+            data:
+              command: *power_toggle
+          turn_off:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.master_bedroom_pedestal_fan_state
+          - action: remote.send_command
+            target:
+              entity_id: remote.master_bedroom_ir_controller
+            data:
+              num_repeats: >-
+                {% from 'in_state_for.jinja' import in_state_for %}
+                {{ 2 if in_state_for('fan.master_bedroom_pedestal_fan', 'on', 120) | bool else 1 }}
+              delay_secs: 0.25
+              command: *power_toggle
+          # set_oscillating:
+          #   service: script.fan_oscillating
+          #   data:
+          #     oscillating: "{{ oscillating }}"
+          # set_percentage:
+          #   service: script.master_bedroom_pedestal_fan_set_speed
+          #   data:
+          #     percentage: "{{ percentage }}"
+          speed_count: 1
