@@ -2,16 +2,8 @@ id: office_zen34
 alias: "Office ZEN34 Remote"
 
 variables:
-  node_id: 256
-
   scene_key_up: '001'
   scene_key_down: '002'
-
-  press_1x: 0
-  press_2x: 3
-  press_3x: 4
-  press_4x: 5
-  press_5x: 6
 
 triggers:
 - id: zjs_scene_trigger
@@ -21,9 +13,8 @@ triggers:
   event_data:
     # Listen for all scene change KeyPressed events for this node, the action section will check specific scene and
     # press counts from the trigger event data.
-    node_id: '{{ node_id }}'
+    node_id: 256
     property: scene
-    value: KeyPressed
 
 actions:
 - alias: 'Determine Button'
@@ -37,7 +28,7 @@ actions:
       - alias: "Pressed Once"
         conditions:
         - condition: template
-          value_template: '{{ trigger.event.data.value_raw == press_1x }}'
+          value_template: '{{ trigger.event.data.value == "KeyPressed" }}'
         sequence:
         - action: light.turn_on
           target:
@@ -46,7 +37,7 @@ actions:
       - alias: 'Pressed Twice'
         conditions:
         - condition: template
-          value_template: '{{ trigger.event.data.value_raw == press_2x }}'
+          value_template: '{{ trigger.event.data.value == "KeyPressed2x" }}'
         sequence:
         - action: fan.turn_on
           data:
@@ -57,7 +48,7 @@ actions:
       - alias: 'Pressed Three Times'
         conditions:
         - condition: template
-          value_template: '{{ trigger.event.data.value_raw == press_3x }}'
+          value_template: '{{ trigger.event.data.value == "KeyPressed3x" }}'
         sequence:
         - parallel:
           - action: light.turn_on
@@ -78,7 +69,7 @@ actions:
       - alias: "Pressed Once"
         conditions:
         - condition: template
-          value_template: '{{ trigger.event.data.value_raw == press_1x }}'
+          value_template: '{{ trigger.event.data.value == "KeyPressed" }}'
         sequence:
         - parallel:
           - action: light.turn_off
@@ -91,7 +82,7 @@ actions:
       - alias: 'Pressed Twice'
         conditions:
         - condition: template
-          value_template: '{{ trigger.event.data.value_raw == press_2x }}'
+          value_template: '{{ trigger.event.data.value == "KeyPressed2x" }}'
         sequence:
         - action: fan.turn_off
           target:
