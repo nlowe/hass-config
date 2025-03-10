@@ -25,15 +25,9 @@ actions:
 - alias: 'Turn On Selected Lights'
   action: script.light_or_switch_turn_on
   data:
-    # This is stupid, there has got to be a better way to do this
     entity_id: >- 
-        {% from 'label_helpers.jinja' import label_all %}
         {{-
-          label_all('devices', ['location_exterior', 'accent_light'])
-          | from_json
-          | map('device_entities')
-          | expand 
-          | selectattr('domain', 'in', ['light', 'switch'])
+          expand('group.outdoor_accent_lights')
           | map(attribute='entity_id')
           | list
         -}}

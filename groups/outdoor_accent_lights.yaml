@@ -1,0 +1,4 @@
+name: 'Outdoor Accent Lights'
+entities:
+- switch.roof_soffit_light
+- switch.garage_exterior_lights

@@ -6,6 +6,8 @@ http: !include http.yaml
 automation: !include automations.yaml
 automation code: !include_dir_list automations/
 
+group: !include_dir_named groups/
+
 script: !include_dir_named scripts/
 
 prometheus: !include prometheus.yaml
