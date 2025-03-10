@@ -1,3 +1,3 @@
 {% macro in_state_for(entity_id, state_name, seconds) %}
-{{ is_state(entity_id, state_name) and (as_timestamp(utcnow()) - as_timestamp(states[entity_id].last_changed)) >= seconds}}
+    {{- is_state(entity_id, state_name) and (as_timestamp(utcnow()) - as_timestamp(states[entity_id].last_changed)) >= seconds -}}
 {% endmacro %}

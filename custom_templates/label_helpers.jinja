@@ -1,12 +1,12 @@
 {%- macro label_any(kind, label_list) -%}
-  {{- label_list | map('label_' + kind) | sum(start=[]) | unique | to_json  -}}
+    {{- label_list | map('label_' + kind) | sum(start=[]) | unique | to_json  -}}
 {%- endmacro -%}
 
 {%- macro label_all(kind, label_list) -%}
-  {%- set ns = namespace(result=[]) -%}
-  {%- set ns.result = label_devices(label_list[0]) -%}
-  {%- for l in label_list[1:] -%}
-    {%- set ns.result = ns.result|select('in',[l] | map('label_' + kind) | sum(start=[]) | list )  -%}
-  {%- endfor -%}
-  {{- ns.result | list | to_json -}}
+    {%- set ns = namespace(result=[]) -%}
+    {%- set ns.result = label_devices(label_list[0]) -%}
+    {%- for l in label_list[1:] -%}
+        {%- set ns.result = ns.result|select('in',[l] | map('label_' + kind) | sum(start=[]) | list )  -%}
+    {%- endfor -%}
+    {{- ns.result | list | to_json -}}
 {%- endmacro -%}
