@@ -1,0 +1,54 @@
+id: outside_accent_lights_on
+
+alias: "Turn On Outside Accent Lights before Sunset"
+
+triggers:
+- id: on_startup
+  alias: "On Startup"
+  platform: homeassistant
+  event: start
+- id: sunset
+  alias: "30m Before Sunset"
+  trigger: sun
+  event: sunset
+  offset: "-00:30:00"
+
+conditions:
+- alias: 'Between 30m before sunset until 30m after sunrise'
+  condition: sun
+  after: sunset
+  after_offset: "-00:30:00"
+  before: sunrise
+  before_offset: "00:30:00"
+
+actions:
+- parallel:
+  - alias: 'Turn On all Outdoor Accent Switches'
+    action: switch.turn_on
+    target:
+      # This is stupid, there has got to be a better way to do this
+      entity_id: >-
+        {% from 'label_helpers.jinja' import label_all %}
+        {{-
+          label_all('devices', ['location_exterior', 'accent_light'])
+          | from_json
+          | map('device_entities')
+          | expand 
+          | selectattr('domain', 'eq', 'switch')
+          | map(attribute='entity_id')
+          | list
+        -}}
+  - alias: 'Turn On all Outdoor Accent Lights'
+    action: light.turn_on
+    target: 
+      entity_id: >-
+        {% from 'label_helpers.jinja' import label_all %}
+        {{-
+          label_all('devices', ['location_exterior', 'accent_light'])
+          | from_json
+          | map('device_entities')
+          | expand 
+          | selectattr('domain', 'eq', 'light')
+          | map(attribute='entity_id')
+          | list
+        -}}

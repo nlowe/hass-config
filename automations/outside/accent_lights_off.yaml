@@ -1,0 +1,53 @@
+id: outside_accent_lights_off
+
+alias: "Turn Off Outside Accent Lights after Sunrise"
+
+triggers:
+- id: on_startup
+  alias: "On Startup"
+  platform: homeassistant
+  event: start
+- id: sunrise
+  alias: "30m After Sunrise"
+  trigger: sun
+  event: sunrise
+  offset: "00:30:00"
+
+conditions:
+- alias: 'Between 30m after sunrise and 30m before sunset'
+  condition: sun
+  after: sunrise
+  after_offset: "00:30:00"
+  before: sunset
+  before_offset: "-00:30:00"
+
+actions:
+- parallel:
+  - alias: 'Turn Off all Outdoor Accent Switches'
+    action: switch.turn_off
+    target: 
+      entity_id: >-
+        {% from 'label_helpers.jinja' import label_all %}
+        {{-
+          label_all('devices', ['location_exterior', 'accent_light'])
+          | from_json
+          | map('device_entities')
+          | expand 
+          | selectattr('domain', 'eq', 'switch')
+          | map(attribute='entity_id')
+          | list
+        -}}
+  - alias: 'Turn Off all Outdoor Accent Lights'
+    action: light.turn_off
+    target: 
+      entity_id: >-
+        {% from 'label_helpers.jinja' import label_all %}
+        {{-
+          label_all('devices', ['location_exterior', 'accent_light'])
+          | from_json
+          | map('device_entities')
+          | expand 
+          | selectattr('domain', 'eq', 'light')
+          | map(attribute='entity_id')
+          | list
+        -}}
