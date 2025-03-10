@@ -1,0 +1,27 @@
+alias: 'Light Or Switch: Turn On'
+description: 'Turn On lights or switches'
+
+sequence:
+- parallel:
+  - alias: 'Turn On Switches'
+    action: switch.turn_on
+    target:
+      entity_id: >-
+        {{-
+          entity_id
+          | expand
+          | selectattr('domain', 'eq', 'switch')
+          | map(attribute='entity_id')
+          | list
+        -}}
+  - alias: 'Turn On Lights'
+    action: light.turn_on
+    target: 
+      entity_id: >-
+        {{-
+          entity_id
+          | expand
+          | selectattr('domain', 'eq', 'light')
+          | map(attribute='entity_id')
+          | list
+        -}}
