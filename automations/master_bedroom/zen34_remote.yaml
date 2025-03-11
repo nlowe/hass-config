@@ -75,7 +75,7 @@ actions:
       - alias: "Pressed Once"
         conditions:
         - condition: template
-          value_template: '{{ trigger.event.data.value_raw == "KeyPressed" }}'
+          value_template: '{{ trigger.event.data.value == "KeyPressed" }}'
         sequence:
         - action: light.turn_off
           target:
@@ -84,7 +84,7 @@ actions:
       - alias: 'Pressed Twice'
         conditions:
         - condition: template
-          value_template: '{{ trigger.event.data.value_raw == "KeyPressed2x" }}'
+          value_template: '{{ trigger.event.data.value == "KeyPressed2x" }}'
         sequence:
         - parallel:
           - action: fan.turn_off

@@ -1,0 +1,37 @@
+# The ZEN71 switch isn't detected as a light by default
+- platform: switch
+  name: "Back Patio Coach Light"
+  entity_id: switch.back_patio_coach_light
+- platform: switch
+  name: "Garage Exterior Lights"
+  entity_id: switch.garage_exterior_lights
+- platform: switch
+  name: "Garage Lights"
+  entity_id: switch.garage_lights
+- platform: switch
+  name: "Garage Service Door Light"
+  entity_id: switch.garage_service_door_light
+- platform: switch
+  name: "Guest Closet Light"
+  entity_id: switch.guest_closet_light
+- platform: switch
+  name: "Laundry Lights"
+  entity_id: switch.laundry_lights
+- platform: switch
+  name: "Master Closet Light"
+  entity_id: switch.master_closet_light
+- platform: switch
+  name: "Office CLoset Light"
+  entity_id: switch.office_closet_light
+- platform: switch
+  name: "Pantry Light"
+  entity_id: switch.pantry_light
+- platform: switch
+  name: "Porch Light"
+  entity_id: switch.porch_light
+- platform: switch
+  name: "Roof Soffit Lights"
+  entity_id: switch.roof_soffit_lights
+- platform: switch
+  name: "Unfinished Basement Lights"
+  entity_id: switch.unfinished_basement_lights

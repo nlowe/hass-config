@@ -1,0 +1,6 @@
+- platform: group
+  name: "Outdoor Accent Lights"
+  unique_id: outdoor_accent_lights
+  entities:
+  - light.garage_exterior_lights
+  - light.roof_soffit_lights

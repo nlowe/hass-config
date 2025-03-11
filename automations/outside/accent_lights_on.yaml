@@ -23,11 +23,6 @@ conditions:
 
 actions:
 - alias: 'Turn On Selected Lights'
-  action: script.light_or_switch_turn_on
+  action: light.turn_on
   data:
-    entity_id: >- 
-        {{-
-          expand('group.outdoor_accent_lights')
-          | map(attribute='entity_id')
-          | list
-        -}}
+    entity_id: light.outdoor_accent_lights
