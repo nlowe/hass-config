@@ -1,0 +1,22 @@
+id: outside_accent_lights
+alias: "Outside Accent Lights"
+description: >-
+  Turn on the exterior outside lights 30 minutes before sunset, and turn them off again 30 minutes after sunrise.
+
+triggers:
+- id: "on"
+  alias: "30m Before Sunset"
+  trigger: sun
+  event: sunset
+  offset: "-00:30:00"
+- id: "off"
+  alias: "30m After Sunrise"
+  trigger: sun
+  event: sunrise
+  offset: "00:30:00"
+
+actions:
+- alias: 'Update Light State'
+  action: "light.turn_{{ trigger.id }}"
+  data:
+    entity_id: light.outdoor_accent_lights
