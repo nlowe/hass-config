@@ -1,0 +1,10 @@
+id: master_bedroom_bed_prep
+name: "Winding Down for the Night"
+entities:
+  light.master_bedroom_ceiling_fan: "on"
+  fan.master_bedroom_ceiling_fan:
+    state: "on"
+    speed: 66
+  fan.master_bedroom_pedestal_fan:
+    state: "on"
+    speed: 66

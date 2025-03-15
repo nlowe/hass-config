@@ -1,0 +1,15 @@
+id: living_room_night_tv
+name: "Night TV"
+entities:
+  # Turn on the Under Cabinet Lights for some ambience
+  light.under_cabinet_lights: "on"
+
+  # Turn off the other major lights
+  light.living_room_lights: "off"
+  light.basement_stair_lights: "off"
+  light.dining_room_lights: "off"
+  light.foyer_lights: "off"
+  light.guest_foyer_light: "off"
+  light.island_pendant_ligjts: "off"
+  light.kitchen_lights: "off"
+
