@@ -7,4 +7,4 @@ entities:
     speed: 66
   fan.master_bedroom_pedestal_fan:
     state: "on"
-    speed: 66
+    speed: 33

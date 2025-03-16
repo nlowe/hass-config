@@ -7,7 +7,7 @@ entities:
     speed: 66
   fan.master_bedroom_pedestal_fan:
     state: "on"
-    speed: 66
+    speed: 33
 
   light.master_bathroom_lights: "off"
   light.master_bathroom_shower_lights: "off"
