@@ -1,0 +1,10 @@
+id: finished_basement_movie_over
+name: "Movie Over"
+entities:
+  light.basement_lights:
+    state: "on"
+    brightness: 255
+  light.basement_stair_lights:
+    state: "on"
+    brightness: 255
+  light.wet_bar_lights: "off"

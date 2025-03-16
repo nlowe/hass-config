@@ -1,0 +1,10 @@
+id: finished_basement_movie_time
+name: "Movie Time"
+entities:
+  light.basement_lights:
+    state: "on"
+    brightness: 26 # ~10%
+  light.wet_bar_lights:
+    state: "on"
+    brightness: 26 # ~10%
+  light.basement_stair_lights: "off"

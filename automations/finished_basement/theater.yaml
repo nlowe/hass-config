@@ -1,0 +1,70 @@
+id: finished_basement_theater
+alias: "Home Theater"
+description: >-
+  Automation for the Theater in the Finished Basement, currently only handling lighting.
+
+triggers:
+- alias: "When the Basement TV Chnges State"
+  trigger: state
+  entity_id: media_player.basement_tv
+  not_from:
+  - "unavailable"
+  - "unknown"
+# The ATV Integration doesn't seem to expose play/pause, but Google Cast does
+# However, Google Cast turns "off" when nothing is playing, so track both entities
+- alias: "When the Basement TV Playback Chnges State"
+  trigger: state
+  entity_id: media_player.basement_tv_cast
+  not_from:
+  - "unavailable"
+  - "unknown"
+
+actions:
+- choose:
+  - conditions:
+    - alias: "TV Turned Off"
+      condition: state
+      entity_id: media_player.basement_tv
+      state: "off"
+    sequence:
+    - action: scene.turn_on
+      target:
+        entity_id: scene.movie_over
+      data:
+        transition: 2.5
+
+  - conditions:
+    - alias: "TV On"
+      condition: state
+      entity_id: media_player.basement_tv
+      state: "on"
+    - alias: "Not Playing Media"
+      condition: state
+      entity_id: media_player.basement_tv_cast
+      state:
+      - "off"
+      - "idle"
+      - "paused"
+      - "standby"
+    sequence:
+    - action: scene.turn_on
+      target:
+        entity_id: scene.movie_time
+      data:
+        transition: 2.5
+
+  - conditions:
+    - alias: "TV On"
+      condition: state
+      entity_id: media_player.basement_tv
+      state: "on"
+    - alias: "Playing Media"
+      condition: state
+      entity_id: media_player.basement_tv_cast
+      state: "playing"
+    sequence:
+    - action: scene.turn_on
+      target:
+        entity_id: scene.movie_in_progress
+      data:
+        transition: 2.5

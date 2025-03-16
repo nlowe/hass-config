@@ -1,0 +1,6 @@
+id: finished_basement_movie_in_progress
+name: "Movie In-Progress"
+entities:
+  light.basement_lights: "off"
+  light.wet_bar_lights: "off"
+  light.basement_stair_lights: "off"
