@@ -1,0 +1,33 @@
+id: living_room_tv_mood_lights
+alias: "Evening Living Room TV Mood Lighting"
+description: >-
+  Configure lights for some nice mood lighting if the TV is turned on in the evening.
+
+triggers:
+- id: sunset
+  alias: "When the sun sets"
+  trigger: sun
+  event: sunset
+- id: tv_on
+  alias: "When the Living Room TV Turns On"
+  trigger: state
+  entity_id:
+  - media_player.living_room_stream_box
+  to: "on"
+
+conditions:
+- alias: "The Sun has Set"
+  condition: state
+  entity_id: sun.sun
+  state: "below_horizon"
+- alias: "The Living Room TV Is On"
+  condition: state
+  entity_id: media_player.living_room_stream_box
+  state: "on"
+
+actions:
+- action: scene.turn_on
+  target:
+    entity_id: scene.night_tv
+  data:
+    transition: 5.0
