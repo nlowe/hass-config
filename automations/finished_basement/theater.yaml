@@ -3,21 +3,30 @@ alias: "Home Theater"
 description: >-
   Automation for the Theater in the Finished Basement, currently only handling lighting.
 
+# If play/pause comes in quick succession just abort the current automation run and start again
+mode: restart
+
+variables:
+  trigger_state_mixin: &trigger_state_mixin
+    not_from:
+    - "unavailable"
+    - "unknown"
+    not_to:
+    - "unavailable"
+    - "unknown"
+    - "buffering"
+
+# The ATV Integration doesn't seem to expose play/pause, but Google Cast does
+# However, Google Cast turns "off" when nothing is playing, so track both entities
 triggers:
 - alias: "When the Basement TV Chnges State"
   trigger: state
   entity_id: media_player.basement_tv
-  not_from:
-  - "unavailable"
-  - "unknown"
-# The ATV Integration doesn't seem to expose play/pause, but Google Cast does
-# However, Google Cast turns "off" when nothing is playing, so track both entities
+  <<: *trigger_state_mixin
 - alias: "When the Basement TV Playback Chnges State"
   trigger: state
   entity_id: media_player.basement_tv_cast
-  not_from:
-  - "unavailable"
-  - "unknown"
+  <<: *trigger_state_mixin
 
 actions:
 - choose:
@@ -31,27 +40,34 @@ actions:
       target:
         entity_id: scene.movie_over
       data:
-        transition: 2.5
+        transition: 2.0
 
   - conditions:
     - alias: "TV On"
       condition: state
       entity_id: media_player.basement_tv
       state: "on"
-    - alias: "Not Playing Media"
-      condition: state
-      entity_id: media_player.basement_tv_cast
-      state:
-      - "off"
-      - "idle"
-      - "paused"
-      - "standby"
+    - or:
+      - alias: "Not Playing Media"
+        condition: state
+        entity_id: media_player.basement_tv_cast
+        state:
+        - "off"
+        - "idle"
+        - "standby"
+      # TODO: Find a better way to differentiate between paused and seeking in YTV
+      - alias: "Paused"
+        condition: state
+        entity_id: media_player.basement_tv_cast
+        state: "paused"
+        for:
+          seconds: 10
     sequence:
     - action: scene.turn_on
       target:
         entity_id: scene.movie_time
       data:
-        transition: 2.5
+        transition: 2.0
 
   - conditions:
     - alias: "TV On"
@@ -67,4 +83,4 @@ actions:
       target:
         entity_id: scene.movie_in_progress
       data:
-        transition: 2.5
+        transition: 2.0

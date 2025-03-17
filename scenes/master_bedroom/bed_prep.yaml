@@ -8,3 +8,4 @@ entities:
   fan.master_bedroom_pedestal_fan:
     state: "on"
     speed: 33
+    oscillating: False

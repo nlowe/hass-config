@@ -8,6 +8,7 @@ entities:
   fan.master_bedroom_pedestal_fan:
     state: "on"
     speed: 33
+    oscillating: False
 
   light.master_bathroom_lights: "off"
   light.master_bathroom_shower_lights: "off"

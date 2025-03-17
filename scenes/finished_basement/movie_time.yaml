@@ -3,8 +3,8 @@ name: "Movie Time"
 entities:
   light.basement_lights:
     state: "on"
-    brightness: 26 # ~10%
+    brightness: 38 # ~15% of 255
   light.wet_bar_lights:
     state: "on"
-    brightness: 26 # ~10%
+    brightness: 38 # ~15% of 255
   light.basement_stair_lights: "off"
