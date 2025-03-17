@@ -5,9 +5,10 @@ description: >-
 
 triggers:
 - id: sunset
-  alias: "When the sun sets"
+  alias: "30m Before Sunset"
   trigger: sun
   event: sunset
+  offset: "-00:30:00"
 - id: tv_on
   alias: "When the Living Room TV Turns On"
   trigger: state
@@ -16,10 +17,11 @@ triggers:
   to: "on"
 
 conditions:
-- alias: "The Sun has Set"
-  condition: state
-  entity_id: sun.sun
-  state: "below_horizon"
+- alias: "30m before Sunset until Sunrise"
+  condition: sun
+  after: sunset
+  after_offset: "-00:30:00"
+  before: sunrise
 - alias: "The Living Room TV Is On"
   condition: state
   entity_id: media_player.living_room_stream_box

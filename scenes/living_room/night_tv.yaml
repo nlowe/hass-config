@@ -12,4 +12,4 @@ entities:
   light.guest_foyer_light: "off"
   light.island_pendant_ligjts: "off"
   light.kitchen_lights: "off"
-
+  light.office_ceiling_fan: "off"
