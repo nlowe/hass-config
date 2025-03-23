@@ -1,0 +1,124 @@
+virtual_devices_living_room_fireplace:
+  input_select:
+    living_room_fireplace_rocks_effect:
+      name: "Living Room Fireplace Rocks Effect"
+      options:
+      - Off
+      - Blue
+      - Dark Blue
+      - Green
+      - Light Blue
+      - Light Purple
+      - Lime Green
+      - Neon Green
+      - Orange
+      - Pink
+      - Purple
+      - Red
+      - RGB Rainbow
+      - Turquoise
+      - White
+
+    living_room_fireplace_flames_effect:
+      name: "Living Room Fireplace Flames Effect"
+      options:
+      - Off
+      - Blue
+      - Orange
+      - Orange / Purple
+      - Purple / Orange
+
+  input_boolean:
+    living_room_fireplace_state:
+
+  automation:
+  - id: "living_room_fireplace_color_changed"
+    alias: "Living Room Fireplace: Sync Rock & Flame State"
+    description: >-
+      Sync the color of the Rocks for the Living Room Fireplace from the input_select, then sync the color of the
+      Living Room Fireplace Flames, since changing the rock color turns off flames.
+    mode: restart
+
+    triggers:
+    - alias: "When the Living Room Fireplace turns on"
+      trigger: state
+      entity_id: input_boolean.living_room_fireplace_state
+      to: "on"
+    - alias: "When the Rock Color changes"
+      trigger: state
+      entity_id: input_select.living_room_fireplace_rocks_effect
+    - alias: "When the Flame Color changes"
+      trigger: state
+      entity_id: input_select.living_room_fireplace_flames_effect
+
+    conditions:
+    - alias: "The Living Room Fireplace is On"
+      condition: state
+      entity_id: input_boolean.living_room_fireplace_state
+      state: "on"
+
+    actions:
+    - action: remote.send_command
+      target:
+        entity_id: remote.living_room_ir_controller
+      data:
+        command: >-
+          {%
+            set commands = {
+              'Off': 'b64:JgBGAM7mEhURFxI1EBYRFhEWEhURFREWETYRNxA2EhURFhEVERYQFxIVEDYRFhE2ERYRFhEWETYQNxE2ERYRNhI2DxcRFhEADQU=',
+              'Blue': 'b64:JgBGAM/nERYRFhI1EhUSFREXERUQFxE1ETYSNhAWERcQFhEVERcRFREWETYQGBE0EhYQFxEVETcSNhE2EBYROBE0ERYRFhEADQU=',
+              'Dark Blue': 'b64:JgBKAAYAAiLQ5RIWEhQSNhEVEhYRFREVEhURNhEVEhYROBEWERYQFRIVExURFRE1EhcRNxAVEhQSFxA2ETYSNRIVETYTNhEUEhUSAA0F',
+              'Green': 'b64:JgBKAMzoERYSFRE4ERYRFREVEhYRFxEUERUSNhIVEhUSFRIXEhUSFRIWETgRFRE2EhUSFBEWETYRNhI1ExUROBA1ERUSFhEACGgEAA0F',
+              'Light Blue': 'b64:JgBKAAsACJ/M6REVEhQRNhIVEhYRFhEVEhQRFhAYEBYRNREWEhYRFhEVERURFxE1ERYQNxEWEBgQFBI4ETURNxAWEjURNhAXEBYSAA0F',
+              'Light Purple': 'b64:JgBGAM3oERUTFRA4EBYSFRIVEBYSFhEUEjURFxE4ERURFxAXERYQFREWETcRFRA5ERUQFw4YETUSNxA0ExcQNhE3ERUSFBIADQU=',
+              'Lime Green': 'b64:JgBGAM7mEhUSFhI3EBYSFhEUERcRFRE2ETYSFREWERURFhIVEhURFREWEjUSFhA5ERURFRIVETYRNhE3ERUSNhA2EhURFhIADQU=',
+              'Neon Green': 'b64:JgBGAM3oEhUSFBI4ERURFhEWERURFhIzEhUSNhIVERYRFxEUERcRFhEWEDYQGBE1ERQRFxEWETYRNhM1EBYRNBU1ExQRFREADQU=',
+              'Orange': 'b64:JgBGANDlEhURFhI2ERYRFRIVEhUSFREUEzUSFBMVEhYTFRIWERUSFhMVEjUSFRM1ERYQFhEWETUSNhM0ExUTNRI1ERYRFRIADQU=',
+              'Pink': 'b64:JgBGAM3oEhUSFBE3EhYRFhEVERYRFRIVEhYRNBE3EhURFhEWERUSFREWEjURFhE1EhUTFBEWEDcQNxE2EhQSNxE1EhYSFREADQU=',
+              'Purple': 'b64:JgBGAM/mEhURFRE3EhUSFhEUEhURFhI1ETYSFhA1EhUSFhEVEhURFRIXEDYRFRE4ERURFBIWETYRNhE3ERQSNhE3ERUSFBEADQU=',
+              'Red': 'b64:JgBGANDmERURFRM0EhUSFRIVEhQSFRI1ERYSFREWERUSFBMVEhURFRIUEzYSFRE1EhYSFREUEjcTMxI1ERUTNxIzEhYRFhIADQU=',
+              'RGB Rainbow': 'b64:JgBGAM3nEhYQFxE2EhURFhIVERYRFRI0EhUSNhE3EBcRFREVERYSFhAWETYRFxE0ERYSFRIVETcQNhE1EhYRNxE1ERUSFhEADQU=',
+              'Turquoise': 'b64:JgBGAMzoEhYRFRE2ERcQFREWERYQFRMVETYROBEUERcQFw8XERURFw8YDjgRFhA2EhcRFBIWEDYRNxE2EhYQNRI2ExURFRIADQU=',
+              'White': 'b64:JgBGAM3oEhYRFRE3ERUUExEWEhUSExIWERYSFRIVERQTFREWEhMSFRIWEjQSFRI4ERUSFREVEjYRNhI0ExUSNBI2EhURFREADQU=',
+            }
+          %}
+          {{ commands.get(states('input_select.living_room_fireplace_rocks_effect')) }}
+    - action: remote.send_command
+      target:
+        entity_id: remote.living_room_ir_controller
+      data:
+        command: >-
+          {%
+            set commands = {
+              'Off': 'b64:JgBGAM7nEhUSFBI2ExQSFRIVEhQRFhIVEhUSMxIWEhQSFBMVEhUUFREVEjYRFRM1ERUSFRIVEhQSNhITEjcSNRI1EhQSFREADQU=',
+              'Blue': 'b64:JgBGAM/nEjURNxITEhUSFRIWEhMSFRI3EjQSFBIVEhUTFBIVERUSFRIWEjUSFRI1EhUSFBIVEhQTNRIVEjQTNhI2EhQTFREADQU=',
+              'Orange': 'b64:JgBGAM7mEjYSFRIVEhMSFhIVEhUSExI2ERUSFBIVEhUSFRMUExUTFRIVEjYSFBI1ERYRFRIVEhURNxIVETYSNRE1EhYSFREADQU=',
+              'Orange / Purple': 'b64:JgBGAM/mEhUSFRIUEhQTFRIVExUSFBIWEhUTFRMUEhYSFRMVEhQSFRQVEjQSFRI2EhQSFRIVEhUSNBIVEjUSNxI0EhURFRIADQU=',
+              'Purple / Orange': 'b64:JgBGAM3nEhYSNRIVEhQSFhIUEhUSFBIVEzMSFRIVEhURFRMVEhUTFBMVEjcSExI3ERUSFBIVEhYRNRIUEjcSNBM0ExUSFREADQU=',
+            }
+          %}
+          {{ commands.get(states('input_select.living_room_fireplace_flames_effect')) }}
+
+  light:
+  - platform: template
+    lights:
+      living_room_fireplace:
+        friendly_name: "Living Room Fireplace"
+        unique_id: living_room_fireplace
+        value_template: "{{ states('input_boolean.living_room_fireplace_state') }}" 
+
+        turn_off:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.living_room_fireplace_state
+        - action: remote.send_command
+          target:
+            entity_id: remote.living_room_ir_controller
+          data:
+            command: b64:JgBGAM/nERYSFRI1EhUTFREWERUSFBI1EhUSNRMVExUSNRIWEjQSFRITEzcSFRE2EhQSFRIVEjUSNhIVEjUSNhI1EhURFRIADQU=
+
+        turn_on:
+        - action: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.living_room_fireplace_state
+        # Automation will take care of syncing the state of rock and flame colors

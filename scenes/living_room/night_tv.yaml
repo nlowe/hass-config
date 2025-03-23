@@ -3,6 +3,8 @@ name: "Night TV"
 entities:
   # Turn on the Under Cabinet Lights for some ambience
   light.under_cabinet_lights: "on"
+  # Might as well turn on the fireplace too
+  light.living_room_fireplace: "on"
 
   # Turn off the other major lights
   light.living_room_lights: "off"
