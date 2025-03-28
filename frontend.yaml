@@ -1,0 +1,70 @@
+themes:
+  _energy_grid_consumption_grafana_palette: &_energy_grid_consumption_grafana_palette
+    # More colors for the energy panel
+    # https://github.com/home-assistant/frontend/discussions/12397#discussioncomment-7231515
+    #
+    # Colors from the grafana classic palette: 
+    # https://github.com/grafana/grafana/blob/b67b9e3c5e828b686b915145c56e0b71f3596334/packages/grafana-data/src/themes/createVisualizationColors.ts#L225
+    energy-grid-consumption-color-0: "#7EB26D"
+    energy-grid-consumption-color-1: "#EAB839"
+    energy-grid-consumption-color-2: "#6ED0E0"
+    energy-grid-consumption-color-3: "#EF843C"
+    energy-grid-consumption-color-4: "#E24D42"
+    energy-grid-consumption-color-5: "#1F78C1"
+    energy-grid-consumption-color-6: "#BA43A9"
+    energy-grid-consumption-color-7: "#705DA0"
+    energy-grid-consumption-color-8: "#508642"
+    energy-grid-consumption-color-9: "#CCA300"
+    energy-grid-consumption-color-10: "#447EBC"
+    energy-grid-consumption-color-11: "#C15C17"
+    energy-grid-consumption-color-12: "#890F02"
+    energy-grid-consumption-color-13: "#0A437C"
+    energy-grid-consumption-color-14: "#6D1F62"
+    energy-grid-consumption-color-15: "#584477"
+    energy-grid-consumption-color-16: "#B7DBAB"
+    energy-grid-consumption-color-17: "#F4D598"
+    energy-grid-consumption-color-18: "#70DBED"
+    energy-grid-consumption-color-19: "#F9BA8F"
+    energy-grid-consumption-color-20: "#F29191"
+    energy-grid-consumption-color-21: "#82B5D8"
+    energy-grid-consumption-color-22: "#E5A8E2"
+    energy-grid-consumption-color-23: "#AEA2E0"
+    energy-grid-consumption-color-24: "#629E51"
+    energy-grid-consumption-color-25: "#E5AC0E"
+    energy-grid-consumption-color-26: "#64B0C8"
+    energy-grid-consumption-color-27: "#E0752D"
+    energy-grid-consumption-color-28: "#BF1B00"
+    energy-grid-consumption-color-29: "#0A50A1"
+    energy-grid-consumption-color-30: "#962D82"
+    energy-grid-consumption-color-31: "#614D93"
+    energy-grid-consumption-color-32: "#9AC48A"
+    energy-grid-consumption-color-33: "#F2C96D"
+    energy-grid-consumption-color-34: "#65C5DB"
+    energy-grid-consumption-color-35: "#F9934E"
+    energy-grid-consumption-color-36: "#EA6460"
+    energy-grid-consumption-color-37: "#5195CE"
+    energy-grid-consumption-color-38: "#D683CE"
+    energy-grid-consumption-color-39: "#806EB7"
+    energy-grid-consumption-color-40: "#3F6833"
+    energy-grid-consumption-color-41: "#967302"
+    energy-grid-consumption-color-42: "#2F575E"
+    energy-grid-consumption-color-43: "#99440A"
+    energy-grid-consumption-color-44: "#58140C"
+    energy-grid-consumption-color-45: "#052B51"
+    energy-grid-consumption-color-46: "#511749"
+    energy-grid-consumption-color-47: "#3F2B5B"
+    energy-grid-consumption-color-48: "#E0F9D7"
+    energy-grid-consumption-color-49: "#FCEACA"
+    energy-grid-consumption-color-50: "#CFFAFF"
+    energy-grid-consumption-color-51: "#F9E2D2"
+    energy-grid-consumption-color-52: "#FCE2DE"
+    energy-grid-consumption-color-53: "#BADFF4"
+    energy-grid-consumption-color-54: "#F9D9F9"
+    energy-grid-consumption-color-55: "#DEDAF7"
+
+  custom:
+    modes:
+      light:
+        <<: *_energy_grid_consumption_grafana_palette
+      dark:
+        <<: *_energy_grid_consumption_grafana_palette

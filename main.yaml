@@ -3,6 +3,7 @@ http: !include http.yaml
 prometheus: !include prometheus.yaml
 
 homeassistant: !include homeassistant.yaml
+frontend: !include frontend.yaml
 
 automation: !include automations.yaml
 automation code: !include_dir_list automations/
