@@ -1,0 +1,24 @@
+- platform: group
+  name: "Master Bedroom Shades"
+  unique_id: master_bedroom_shades
+  entities:
+  - cover.master_bedroom_left_transom_shade
+  - cover.master_bedroom_center_transom_shade
+  - cover.master_bedroom_right_transom_shade
+  - cover.master_bedroom_left_shade
+  - cover.master_bedroom_right_shade
+
+- platform: group
+  name: "Master Bedroom Transom Shades"
+  unique_id: master_bedroom_transom_shades
+  entities:
+  - cover.master_bedroom_left_transom_shade
+  - cover.master_bedroom_center_transom_shade
+  - cover.master_bedroom_right_transom_shade
+
+- platform: group
+  name: "Master Bedroom Main Shades"
+  unique_id: master_bedroom_main_shades
+  entities:
+  - cover.master_bedroom_left_shade
+  - cover.master_bedroom_right_shade

@@ -1,0 +1,7 @@
+- platform: group
+  name: "Living Room Shades"
+  unique_id: living_room_shades
+  entities:
+  - cover.living_room_center_shade
+  - cover.living_room_left_shade
+  - cover.living_room_right_shade

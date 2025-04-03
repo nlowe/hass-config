@@ -1,0 +1,22 @@
+- platform: group
+  name: "Dining Room Shades"
+  unique_id: dining_room_shades
+  entities:
+  - cover.dining_room_back_left_shade
+  - cover.dining_room_back_right_shade
+  - cover.dining_room_side_left_shade
+  - cover.dining_room_side_right_shade
+
+- platform: group
+  name: "Dining Room Back Shades"
+  unique_id: dining_room_back_shades
+  entities:
+  - cover.dining_room_back_left_shade
+  - cover.dining_room_back_right_shade
+
+- platform: group
+  name: "Dining Room Side Shades"
+  unique_id: dining_room_side_shades
+  entities:
+  - cover.dining_room_side_left_shade
+  - cover.dining_room_side_right_shade

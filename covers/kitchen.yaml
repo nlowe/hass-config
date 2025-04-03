@@ -1,0 +1,6 @@
+- platform: group
+  name: "Kitchen Shades"
+  unique_id: kitchen_shades
+  entities:
+  - cover.kitchen_left_shade
+  - cover.kitchen_right_shade

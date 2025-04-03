@@ -1,0 +1,6 @@
+- platform: group
+  name: "Guest Bedroom Shades"
+  unique_id: guest_bedroom_shades
+  entities:
+  - cover.guest_bedroom_left_shade
+  - cover.guest_bedroom_right_shade

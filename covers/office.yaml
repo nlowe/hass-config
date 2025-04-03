@@ -1,0 +1,6 @@
+- platform: group
+  name: "Office Shades"
+  unique_id: office_shades
+  entities:
+  - cover.office_left_shade
+  - cover.office_right_shade
