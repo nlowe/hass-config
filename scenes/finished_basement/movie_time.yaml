@@ -8,3 +8,6 @@ entities:
     state: "on"
     brightness: 38 # ~15% of 255
   light.basement_stair_lights: "off"
+  cover.basement_theater_shade:
+    state: "closed"
+    current_position: 0

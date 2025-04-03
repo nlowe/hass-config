@@ -8,3 +8,6 @@ entities:
     state: "on"
     brightness: 255
   light.wet_bar_lights: "off"
+  cover.basement_theater_shade:
+    state: "open"
+    current_position: 100
