@@ -9,6 +9,9 @@ entities:
     state: "on"
     speed: 33
     oscillating: False
+  cover.master_bedroom_shades:
+    state: "closed"
+    current_position: 0
 
   light.master_bathroom_lights: "off"
   light.master_bathroom_shower_lights: "off"

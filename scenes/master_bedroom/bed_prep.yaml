@@ -9,3 +9,6 @@ entities:
     state: "on"
     speed: 33
     oscillating: False
+  cover.master_bedroom_shades:
+    state: "closed"
+    current_position: 0

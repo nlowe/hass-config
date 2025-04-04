@@ -1,0 +1,9 @@
+id: master_bedroom_end_sleep
+name: "Finished Sleeping"
+entities:
+  fan.master_bedroom_ceiling_fan: "off"
+  fan.master_bedroom_pedestal_fan: "off"
+  cover.master_bedroom_shades:
+    state: "open"
+    current_position: 65
+

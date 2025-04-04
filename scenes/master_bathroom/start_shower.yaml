@@ -1,0 +1,14 @@
+id: master_bathroom_start_shower
+name: "Prepare for a Shower"
+entities:
+  light.master_bathroom_lights:
+    state: "on"
+    brightness: 255
+  light.master_bathroom_shower_lights:
+    state: "on"
+    brightness: 255
+  cover.master_bathroom_shade:
+    state: "closed"
+    current_position: 0
+  switch.master_bathroom_fan: "on"
+  # TODO: Can we start the shower with the preset here?
