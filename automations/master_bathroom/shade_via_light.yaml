@@ -26,18 +26,18 @@ actions:
     - condition: template
       value_template: '{{ trigger.event.data.property_key == scene_key_up }}'
     sequence:
-    - action: cover.open_cover
+    - action: cover.set_cover_position
       target:
         entity_id: cover.master_bathroom_shade
       data:
-        position: 100
+        position: 65
   - alias: 'Down Paddle'
     conditions:
     - condition: template
       value_template: '{{ trigger.event.data.property_key == scene_key_down }}'
     sequence:
     - alias: "Close the Shade"
-      action: cover.close_cover
+      action: cover.set_cover_position
       target:
         entity_id: cover.master_bathroom_shade
       data:
