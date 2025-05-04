@@ -1,0 +1,55 @@
+id: master_bathroom_shower_fan
+alias: "Master Bathroom Shower Fan Control"
+description: >-
+  Turn on the bathroom fan when the shower is running, and keep it running for 20 minutes after the shower turns off.
+
+triggers:
+- id: shower_turned_on
+  alias: "The Shower was turned on"
+  trigger: state
+  entity_id: switch.u_by_moen_037d8f
+  from: "off"
+  to: "on"
+- id: shower_turned_off
+  alias: "The Shower was turned off"
+  trigger: state
+  entity_id: switch.u_by_moen_037d8f
+  from: "on"
+  to: "off"
+- id: master_bathroom_fan_cooldown_complete
+  alias: "Shower Fan Cooldown Complete"
+  trigger: event
+  event_type: timer.finished
+  event_data:
+    entity_id: timer.master_bathroom_fan_cooldown
+
+actions:
+- choose:
+  - alias: "Cancel the fan cooldown timer when the shower turns on"
+    conditions:
+    - condition: trigger
+      id: shower_turned_on
+    sequence:
+    - action: timer.cancel
+      target:
+        entity_id: timer.master_bathroom_fan_cooldown
+
+  - alias: "Start the fan cooldown timer when the shower turns off"
+    conditions:
+    - condition: trigger
+      id: shower_turned_off
+    sequence:
+    - action: timer.start
+      target:
+        entity_id: timer.master_bathroom_fan_cooldown
+      data:
+        duration: 00:20:00
+
+  - alias: "Turn off the fan after the cooldown timer finishes"
+    conditions:
+    - condition: trigger
+      id: master_bathroom_fan_cooldown_complete
+    sequence:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.master_bathroom_fan

@@ -1,0 +1,35 @@
+id: master_bathroom_lights_off
+alias: "Master Bathroom Lights Off"
+description: >-
+  Turn off all Master Bathroom related lights when some lights turn off.
+
+mode: restart
+
+triggers:
+- id: lights_off
+  alias: "Bathroom Lights turned off"
+  trigger: state
+  entity_id: light.master_bathroom_lights
+  from: "on"
+  to: "off"
+- id: shower_lights_off
+  alias: "Shower Lights turned off"
+  trigger: state
+  entity_id: light.master_bathroom_shower_lights
+  from: "on"
+  to: "off"
+
+actions:
+- alias: "Turn off all related lights"
+  parallel:
+  - action: light.turn_off
+    target:
+      entity_id:
+      - light.master_bathroom_lights
+      - light.master_bathroom_shower_lights
+      - light.master_bathroom_toilet_light
+    data:
+      transition: 2
+  - action: switch.turn_off
+    target:
+      entity_id: switch.master_closet_light
