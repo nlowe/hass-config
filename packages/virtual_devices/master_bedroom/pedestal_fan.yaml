@@ -3,13 +3,11 @@ virtual_devices_master_bedroom_pedestal_fan:
     master_bedroom_pedestal_fan_commands:
       name: "Broadlink Commands for Master Bedroom Pedestal Fan"
       options:
-        - &power_toggle b64:JgCqACoNKQ4MKygMKA8NKgwoDigOKg0oDSop6CkOKA4NKSkNKA0OKQwqDSgQJw0pDCop6CkOKA4MKigOKA0OKQ0oDikMKg4oDCsn6SkOJw4NKygNJw4NKwwoDigNKg4pDCgp6SgPKA0NKSkOKA0OKgwoDSkOKQ4oDCkq6CgPKA4MKSgOKQ4NKg0oDSoNKg0oDCkp6SkOKA4MKSoMKQ4NKQ0oDikNKQ0qDCgpAA0F
-        - &oscillate_toggle b64:JgCcACoOKA4NKSgOKA4NKQ4nKQ4NKg0nDSsNAAEEKQ4oDA4qJw4pDQ0qDSknDw0pDSkNKQ4AAQQpDSgNDSsoDigNDCoOKScODygMKg0pDQABBSgOKA0NKikNKA4MKg0pKA0NKwwpDikMAAEFKQ4oDg0oKQ8oDgwpDigpDg0qDCgNKg4AAQMpDygMDSkpDikNDCoNKSgODCoNKQ0oEAANBQ==
-        - &cycle_speed b64:JgCcACsNKQ4MKikMKA8NKgwoDSkOKg0oKA0OAAEFKQwoDwwpKg0nDg4qDCgOKA0rDSgpDA0AAQUpDigODCkqDSgODSkNKA4pDSkOKCgODQABBCkOKA4NKCoMKQ4NKQ0oDSoNKg0oKA0NAAEFKA8oDgwqKA0pDg0pDSgNKQ4qDSknDQ0AAQYoDSkOCyopDigODCoMKg0oDSoMKikMDAANBQ==
+        - &power_toggle b64:JgBoAAABIZERNxITEhMRFBITEhMSEhITEhMSNxM3EjYSNxI3EzcRNxI3EjcTExISEhMSExITEhMSExITEjYSNxI4ETgSNhI3EzcSNhITEhMSExITEhMSExITEhMROBI3EjcSNhI4ETgSAA0F
+        - &cycle_speed b64:JgBoAAABIJESNhMSExITEhMSEhQSExITERMSNxE4EjcTNhI3EjcSOBE3EjcSNxMSERMSExITExMSExITERQSNhI3EjcTNxI2EjcSNxM3ERMRFBEUEhMSExITEhMRFBI2EjgSNxI3ETcSAA0F
 
   input_boolean:
     master_bedroom_pedestal_fan_state:
-    master_bedroom_pedestal_fan_osc:
 
   input_number:
     master_bedroom_pedestal_fan_percentage:
@@ -24,8 +22,6 @@ virtual_devices_master_bedroom_pedestal_fan:
           unique_id: master_bedroom_pedestal_fan
           value_template: "{{ states('input_boolean.master_bedroom_pedestal_fan_state') }}"
           percentage_template: "{{ states('input_number.master_bedroom_pedestal_fan_percentage') if is_state('input_boolean.master_bedroom_pedestal_fan_state', 'on') else 0 }}"
-          # This template expects true/false instead of on/off and input_boolean maps to on/off
-          oscillating_template: "{{ is_state('input_boolean.master_bedroom_pedestal_fan_osc', 'on') if is_state('input_boolean.master_bedroom_pedestal_fan_state', 'on') else false }}"
 
           turn_on: &turn_on_commands
           - action: input_boolean.turn_on
@@ -41,30 +37,16 @@ virtual_devices_master_bedroom_pedestal_fan:
           - action: input_boolean.turn_off
             target:
               entity_id: input_boolean.master_bedroom_pedestal_fan_state
+          - action: input_number.set_value
+            target:
+              entity_id: input_number.master_bedroom_pedestal_fan_percentage
+            data:
+              value: 0
           - action: remote.send_command
             target:
               entity_id: remote.master_bedroom_ir_controller
             data:
-              # If this fan has been on for more than 120s, the power button needs to be pressed twice to turn it off
-              num_repeats: >-
-                {% from 'state.jinja' import in_state_for %}
-                {{ 2 if in_state_for('fan.master_bedroom_pedestal_fan', 'on', 120) | bool else 1 }}
-              delay_secs: 0.25
               command: *power_toggle
-
-          set_oscillating:
-          # Only send the oscillate command if the state is changing
-          - if: "{{ is_state('input_boolean.master_bedroom_pedestal_fan_osc', 'on') != oscillating }}"
-            then:
-            - action: remote.send_command
-              target:
-                entity_id: remote.master_bedroom_ir_controller
-              data:
-                command: *oscillate_toggle
-          # Then persist the state
-          - action: "input_boolean.turn_{{ 'on' if oscillating else 'off' }}"
-            target:
-              entity_id: input_boolean.master_bedroom_pedestal_fan_osc
 
           speed_count: 3
           set_percentage:
