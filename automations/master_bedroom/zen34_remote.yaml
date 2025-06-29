@@ -39,32 +39,13 @@ actions:
         - condition: template
           value_template: '{{ trigger.event.data.value == "KeyPressed2x" }}'
         sequence:
-        - parallel:
-          - action: fan.turn_on
-            data:
-              percentage: 66
-            target:
-              entity_id: fan.master_bedroom_ceiling_fan
-          - action: fan.turn_on
-            data:
-              percentage: 66
-            target:
-              entity_id: fan.master_bedroom_pedestal_fan
-
-      - alias: 'Pressed Three Times'
-        conditions:
-        - condition: template
-          value_template: '{{ trigger.event.data.value == "KeyPressed3x" }}'
-        sequence:
-        - parallel:
-          - action: light.turn_on
-            target:
-              entity_id: light.office_ceiling_fan
-          - action: fan.turn_on
-            data:
-              percentage: 66
-            target:
-              entity_id: fan.office_ceiling_fan
+        - action: fan.turn_on
+          data:
+            percentage: 66
+          target:
+            entity_id: 
+            - fan.master_bedroom_ceiling_fan
+            - fan.master_bedroom_pedestal_fan
 
   - alias: 'Down Paddle'
     conditions:
@@ -89,3 +70,14 @@ actions:
         - action: scene.turn_on
           target:
             entity_id: scene.master_bedroom_end_sleep
+
+      - alias: 'Pressed Three Times'
+        conditions:
+        - condition: template
+          value_template: '{{ trigger.event.data.value == "KeyPressed3x" }}'
+        sequence:
+        - action: fan.turn_on
+          target:
+            entity_id:
+            - fan.master_bedroom_ceiling_fan
+            - fan.master_bedroom_pedestal_fan
