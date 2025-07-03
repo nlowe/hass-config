@@ -76,7 +76,7 @@ actions:
         - condition: template
           value_template: '{{ trigger.event.data.value == "KeyPressed3x" }}'
         sequence:
-        - action: fan.turn_on
+        - action: fan.turn_off
           target:
             entity_id:
             - fan.master_bedroom_ceiling_fan
