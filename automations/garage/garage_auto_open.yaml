@@ -1,0 +1,22 @@
+id: garage_auto_open
+alias: "Automatically Open the Garage Door when leaving"
+description: >-
+  Automatically open the garage door when the Foyer Door opens while the security panel is armed.
+
+triggers:
+- alias: "When the Foyer Door opens"
+  trigger: state
+  entity_id: binary_sensor.qolsys_iq4_alarm_panel_foyer_door
+  to: "on"
+
+conditions:
+- alias: "The Security Panel is being Armed"
+  condition: state
+  entity_id: alarm_control_panel.qolsys_iq4_alarm_panel_system
+  state: arming
+
+actions:
+- alias: "Open the Garage Door"
+  action: cover.open_cover
+  target:
+    entity_id: cover.ratgdo32_disco_door

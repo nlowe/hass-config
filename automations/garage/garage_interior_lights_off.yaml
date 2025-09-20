@@ -1,0 +1,48 @@
+id: garage_interior_lights_off
+alias: "Turn Off Garage Interior Lights"
+
+triggers:
+- alias: "The Foyer Door has been Closed for 5 Minutes"
+  trigger: state
+  entity_id: binary_sensor.qolsys_iq4_alarm_panel_foyer_door
+  from: "on"
+  to: "off"
+  for:
+    minutes: 5
+- alias: "The Garage Service Door has been Closed for 5 minutes"
+  trigger: state
+  entity_id: binary_sensor.qolsys_iq4_alarm_panel_garage_man_door
+  from: "on"
+  to: "off"
+  for:
+    minutes: 5
+- alias: "The Garage Interia Camera stops detecting a person for 5 minutes"
+  trigger: state
+  entity_id: binary_sensor.garage_interior_person_detected
+  from: "on"
+  to: "off"
+  for:
+    minutes: 5
+- alias: "The Garage Door has been Open for 5 minutes"
+  trigger: state
+  entity_id: cover.ratgdo32_disco_door
+  to: open
+  for:
+    minutes: 5
+
+conditions:
+- alias: "The Garage Interior Camera is not detecting a person"
+  condition: not
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.garage_interior_person_detected
+    state: "on"
+- alias: "The Garage Interior Lights are On"
+  condition: state
+  entity_id: light.garage_lights
+  state: "on"
+
+actions:
+- alias: "Turn Off the Garage Interior Lights"
+  action: light.turn_off
+  entity_id: light.garage_lights
