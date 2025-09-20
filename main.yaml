@@ -16,6 +16,8 @@ cover: !include_dir_merge_list covers/
 scene: !include scenes.yaml
 scene code: !include_dir_list scenes/
 
-script: !include_dir_merge_named scripts/
+script: !include_dir_named scripts/
+
+template: !include_dir_list template_entities/
 
 timer: !include_dir_merge_named timers/
