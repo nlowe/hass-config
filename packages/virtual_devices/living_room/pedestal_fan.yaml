@@ -14,68 +14,66 @@ virtual_devices_living_room_pedestal_fan:
       min: 0
       max: 100
 
-  fan:
-    - platform: template
-      fans:
-        living_room_pedestal_fan:
-          friendly_name: "Living Room Pedestal Fan"
-          unique_id: living_room_pedestal_fan
-          value_template: "{{ states('input_boolean.living_room_pedestal_fan_state') }}"
-          percentage_template: "{{ states('input_number.living_room_pedestal_fan_percentage') if is_state('input_boolean.living_room_pedestal_fan_state', 'on') else 0 }}"
+  template:
+    - fan:
+      - name: "Living Room Pedestal Fan"
+        unique_id: living_room_pedestal_fan
+        state: "{{ states('input_boolean.living_room_pedestal_fan_state') }}"
+        percentage: "{{ states('input_number.living_room_pedestal_fan_percentage') if is_state('input_boolean.living_room_pedestal_fan_state', 'on') else 0 }}"
 
-          turn_on: &turn_on_commands
-          - action: input_boolean.turn_on
-            target:
-              entity_id: input_boolean.living_room_pedestal_fan_state
-          - action: remote.send_command
-            target:
-              entity_id: remote.living_room_ir_controller
-            data:
-              command: *power_toggle
+        turn_on: &turn_on_commands
+        - action: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.living_room_pedestal_fan_state
+        - action: remote.send_command
+          target:
+            entity_id: remote.living_room_ir_controller
+          data:
+            command: *power_toggle
 
-          turn_off: &turn_off_commands
-          - action: input_boolean.turn_off
-            target:
-              entity_id: input_boolean.living_room_pedestal_fan_state
-          - action: input_number.set_value
-            target:
-              entity_id: input_number.living_room_pedestal_fan_percentage
-            data:
-              value: 0
-          - action: remote.send_command
-            target:
-              entity_id: remote.living_room_ir_controller
-            data:
-              command: *power_toggle
+        turn_off: &turn_off_commands
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.living_room_pedestal_fan_state
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.living_room_pedestal_fan_percentage
+          data:
+            value: 0
+        - action: remote.send_command
+          target:
+            entity_id: remote.living_room_ir_controller
+          data:
+            command: *power_toggle
 
-          speed_count: 3
-          set_percentage:
-          # Home Assistant seems to turn the fan off by setting the speed to 0.
-          # TODO: Can we just remove the on/off scripts?
-          - if: "{{ percentage == 0 }}"
-            then: 
-            - parallel: *turn_off_commands
-            - stop: "Fan turned off"
+        speed_count: 3
+        set_percentage:
+        # Home Assistant seems to turn the fan off by setting the speed to 0.
+        # TODO: Can we just remove the on/off scripts?
+        - if: "{{ percentage == 0 }}"
+          then: 
+          - parallel: *turn_off_commands
+          - stop: "Fan turned off"
 
-          # Turn the fan on if we need to, Home Assistant doesn't seem to send this as a separate event
-          - if: "{{ not is_state('input_boolean.living_room_pedestal_fan_state', 'on') }}"
-            then: *turn_on_commands
+        # Turn the fan on if we need to, Home Assistant doesn't seem to send this as a separate event
+        - if: "{{ not is_state('input_boolean.living_room_pedestal_fan_state', 'on') }}"
+          then: *turn_on_commands
 
-          # Send the commands first so we can caluclate how many button presses to send
-          - action: remote.send_command
-            target:
-              entity_id: remote.living_room_ir_controller
-            data:
-              num_repeats: >-
-                {% set current_percentage = states('input_number.living_room_pedestal_fan_percentage') | int %}
-                {% set current_offset     = 0 if current_percentage <= 33 else (1 if current_percentage <= 67 else 2) %}
-                {% set target_offset      = 0 if percentage <= 33 else (1 if percentage <= 67 else 2) %}
-                {{ (target_offset - current_offset) % 3 }}
-              delay_secs: 0.25
-              command: *cycle_speed
-          # Then persist the state
-          - action: input_number.set_value
-            target:
-              entity_id: input_number.living_room_pedestal_fan_percentage
-            data:
-              value: "{{ percentage }}"
+        # Send the commands first so we can caluclate how many button presses to send
+        - action: remote.send_command
+          target:
+            entity_id: remote.living_room_ir_controller
+          data:
+            num_repeats: >-
+              {% set current_percentage = states('input_number.living_room_pedestal_fan_percentage') | int %}
+              {% set current_offset     = 0 if current_percentage <= 33 else (1 if current_percentage <= 67 else 2) %}
+              {% set target_offset      = 0 if percentage <= 33 else (1 if percentage <= 67 else 2) %}
+              {{ (target_offset - current_offset) % 3 }}
+            delay_secs: 0.25
+            command: *cycle_speed
+        # Then persist the state
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.living_room_pedestal_fan_percentage
+          data:
+            value: "{{ percentage }}"

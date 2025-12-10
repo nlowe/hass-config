@@ -16,84 +16,82 @@ virtual_devices_basement_desk_pedestal_fan:
       min: 0
       max: 100
 
-  fan:
-    - platform: template
-      fans:
-        basement_desk_pedestal_fan:
-          friendly_name: "Basement Desk Pedestal Fan"
-          unique_id: basement_desk_pedestal_fan
-          value_template: "{{ states('input_boolean.basement_desk_pedestal_fan_state') }}"
-          percentage_template: "{{ states('input_number.basement_desk_pedestal_fan_percentage') if is_state('input_boolean.basement_desk_pedestal_fan_state', 'on') else 0 }}"
-          # This template expects true/false instead of on/off and input_boolean maps to on/off
-          oscillating_template: "{{ is_state('input_boolean.basement_desk_pedestal_fan_osc', 'on') if is_state('input_boolean.basement_desk_pedestal_fan_state', 'on') else false }}"
+  template:
+    - fan:
+      - name: "Basement Desk Pedestal Fan"
+        unique_id: basement_desk_pedestal_fan
+        state: "{{ states('input_boolean.basement_desk_pedestal_fan_state') }}"
+        percentage: "{{ states('input_number.basement_desk_pedestal_fan_percentage') if is_state('input_boolean.basement_desk_pedestal_fan_state', 'on') else 0 }}"
+        # This template expects true/false instead of on/off and input_boolean maps to on/off
+        oscillating: "{{ is_state('input_boolean.basement_desk_pedestal_fan_osc', 'on') if is_state('input_boolean.basement_desk_pedestal_fan_state', 'on') else false }}"
 
-          turn_on: &turn_on_commands
-          - action: input_boolean.turn_on
-            target:
-              entity_id: input_boolean.basement_desk_pedestal_fan_state
+        turn_on: &turn_on_commands
+        - action: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.basement_desk_pedestal_fan_state
+        - action: remote.send_command
+          target:
+            entity_id: remote.basement_desk_ir_controller
+          data:
+            command: *power_toggle
+
+        turn_off: &turn_off_commands
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.basement_desk_pedestal_fan_state
+        - action: remote.send_command
+          target:
+            entity_id: remote.basement_desk_ir_controller
+          data:
+            # If this fan has been on for more than 120s, the power button needs to be pressed twice to turn it off
+            num_repeats: >-
+              {% from 'state.jinja' import in_state_for %}
+              {{ 2 if in_state_for('fan.basement_desk_pedestal_fan', 'on', 120) | bool else 1 }}
+            delay_secs: 0.25
+            command: *power_toggle
+
+        set_oscillating:
+        # Only send the oscillate command if the state is changing
+        - if: "{{ is_state('input_boolean.basement_desk_pedestal_fan_osc', 'on') != oscillating }}"
+          then:
           - action: remote.send_command
             target:
               entity_id: remote.basement_desk_ir_controller
             data:
-              command: *power_toggle
+              command: *oscillate_toggle
+        # Then persist the state
+        - action: "input_boolean.turn_{{ 'on' if oscillating else 'off' }}"
+          target:
+            entity_id: input_boolean.basement_desk_pedestal_fan_osc
 
-          turn_off: &turn_off_commands
-          - action: input_boolean.turn_off
-            target:
-              entity_id: input_boolean.basement_desk_pedestal_fan_state
-          - action: remote.send_command
-            target:
-              entity_id: remote.basement_desk_ir_controller
-            data:
-              # If this fan has been on for more than 120s, the power button needs to be pressed twice to turn it off
-              num_repeats: >-
-                {% from 'state.jinja' import in_state_for %}
-                {{ 2 if in_state_for('fan.basement_desk_pedestal_fan', 'on', 120) | bool else 1 }}
-              delay_secs: 0.25
-              command: *power_toggle
+        speed_count: 3
+        set_percentage:
+        # Home Assistant seems to turn the fan off by setting the speed to 0.
+        # TODO: Can we just remove the on/off scripts?
+        - if: "{{ percentage == 0 }}"
+          then: 
+          - parallel: *turn_off_commands
+          - stop: "Fan turned off"
 
-          set_oscillating:
-          # Only send the oscillate command if the state is changing
-          - if: "{{ is_state('input_boolean.basement_desk_pedestal_fan_osc', 'on') != oscillating }}"
-            then:
-            - action: remote.send_command
-              target:
-                entity_id: remote.basement_desk_ir_controller
-              data:
-                command: *oscillate_toggle
-          # Then persist the state
-          - action: "input_boolean.turn_{{ 'on' if oscillating else 'off' }}"
-            target:
-              entity_id: input_boolean.basement_desk_pedestal_fan_osc
+        # Turn the fan on if we need to, Home Assistant doesn't seem to send this as a separate event
+        - if: "{{ not is_state('input_boolean.basement_desk_pedestal_fan_state', 'on') }}"
+          then: *turn_on_commands
 
-          speed_count: 3
-          set_percentage:
-          # Home Assistant seems to turn the fan off by setting the speed to 0.
-          # TODO: Can we just remove the on/off scripts?
-          - if: "{{ percentage == 0 }}"
-            then: 
-            - parallel: *turn_off_commands
-            - stop: "Fan turned off"
-
-          # Turn the fan on if we need to, Home Assistant doesn't seem to send this as a separate event
-          - if: "{{ not is_state('input_boolean.basement_desk_pedestal_fan_state', 'on') }}"
-            then: *turn_on_commands
-
-          # Send the commands first so we can caluclate how many button presses to send
-          - action: remote.send_command
-            target:
-              entity_id: remote.basement_desk_ir_controller
-            data:
-              num_repeats: >-
-                {% set current_percentage = states('input_number.basement_desk_pedestal_fan_percentage') | int %}
-                {% set current_offset     = 0 if current_percentage <= 33 else (1 if current_percentage <= 67 else 2) %}
-                {% set target_offset      = 0 if percentage <= 33 else (1 if percentage <= 67 else 2) %}
-                {{ (target_offset - current_offset) % 3 }}
-              delay_secs: 0.25
-              command: *cycle_speed
-          # Then persist the state
-          - action: input_number.set_value
-            target:
-              entity_id: input_number.basement_desk_pedestal_fan_percentage
-            data:
-              value: "{{ percentage }}"
+        # Send the commands first so we can caluclate how many button presses to send
+        - action: remote.send_command
+          target:
+            entity_id: remote.basement_desk_ir_controller
+          data:
+            num_repeats: >-
+              {% set current_percentage = states('input_number.basement_desk_pedestal_fan_percentage') | int %}
+              {% set current_offset     = 0 if current_percentage <= 33 else (1 if current_percentage <= 67 else 2) %}
+              {% set target_offset      = 0 if percentage <= 33 else (1 if percentage <= 67 else 2) %}
+              {{ (target_offset - current_offset) % 3 }}
+            delay_secs: 0.25
+            command: *cycle_speed
+        # Then persist the state
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.basement_desk_pedestal_fan_percentage
+          data:
+            value: "{{ percentage }}"

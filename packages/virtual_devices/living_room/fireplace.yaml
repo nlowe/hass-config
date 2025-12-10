@@ -99,13 +99,11 @@ virtual_devices_living_room_fireplace:
           %}
           {{ commands.get(states('input_select.living_room_fireplace_flames_effect')) }}
 
-  light:
-  - platform: template
-    lights:
-      living_room_fireplace:
-        friendly_name: "Living Room Fireplace"
+  template:
+    - light:
+      - name: "Living Room Fireplace"
         unique_id: living_room_fireplace
-        value_template: "{{ states('input_boolean.living_room_fireplace_state') }}" 
+        state: "{{ states('input_boolean.living_room_fireplace_state') }}" 
 
         turn_off:
         - action: input_boolean.turn_off

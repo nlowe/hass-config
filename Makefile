@@ -1,4 +1,4 @@
-HASS_VERSION := 2025.1.4
+HASS_VERSION := 2025.12.2
 
 .PHONY: all
 all: lint
