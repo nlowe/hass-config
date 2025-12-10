@@ -1,0 +1,73 @@
+id: outside_water_lawn
+alias: "Water the Lawn"
+description: Waters the lawn, running each sprinkler zone for 5 minutes.
+
+# TODO: Triggers
+triggers:
+- alias: "At 6am Every Day"
+  enabled: false
+  trigger: time
+  at: "06:00:00"
+
+- alias: "At Noon Every Day"
+  enabled: false
+  trigger: time
+  at: "12:00:00"
+
+- alias: "At 6pm Every Day"
+  enabled: false
+  trigger: time
+  at: "18:00:00"
+
+variables:
+  duration: &duration
+    minutes: 5
+
+actions:
+- alias: "Water the Front Yard"
+  action: script.outdoor_sprinkler_timer
+  data:
+    friendly_name: front_yard_hose_valve
+    duration:
+      <<: *duration
+- alias: "Wait for the Front Yard Valve to turn off"
+  wait_template: "{{ is_state('switch.front_yard_hose_valve', 'off') }}"
+  timeout:
+    seconds: 10
+  continue_on_timeout: false
+
+- alias: "Water the East Side Yard"
+  action: script.outdoor_sprinkler_timer
+  data:
+    friendly_name: east_side_yard_hose_valve
+    duration:
+      <<: *duration
+- alias: "Wait for the East Side Yard Valve to turn off"
+  wait_template: "{{ is_state('switch.east_side_yard_hose_valve', 'off') }}"
+  timeout:
+    seconds: 10
+  continue_on_timeout: false
+
+- alias: "Water the Back Yard"
+  action: script.outdoor_sprinkler_timer
+  data:
+    friendly_name: back_yard_hose_valve
+    duration:
+      <<: *duration
+- alias: "Wait for the Back Yard Valve to turn off"
+  wait_template: "{{ is_state('switch.back_yard_hose_valve', 'off') }}"
+  timeout:
+    seconds: 10
+  continue_on_timeout: false
+
+- alias: "Water the West Side Yard"
+  action: script.outdoor_sprinkler_timer
+  data:
+    friendly_name: west_side_yard_hose_valve
+    duration:
+      <<: *duration
+- alias: "Wait for the West Side Yard Valve to turn off"
+  wait_template: "{{ is_state('switch.west_side_yard_hose_valve', 'off') }}"
+  timeout:
+    seconds: 10
+  continue_on_timeout: false

@@ -1,0 +1,64 @@
+# This entity tracks the number of 'update' entities from the ZWave JS integration that have an update available or are
+# currently installing an update.
+
+triggers:
+# Update the sensor on any state change. The 'update' entity will go 'on' when an update becomes available and 'off'
+# after the update is installed. We have to defer filtering to conditions because the domain and integration are not
+# exposed in the event_data.
+- trigger: event
+  id: state_changed
+  event_type: state_changed
+
+# Also update whenever template entities get reloaded.
+- trigger: event
+  id: event_template_reloaded
+  event_type: event_template_reloaded
+
+conditions:
+- condition: or
+  conditions:
+  - condition: trigger
+    id: event_template_reloaded
+
+  # Make sure this state change belongs to an 'update' entity from the ZWave JS Integration.
+  - condition: template
+    value_template: >-
+      {{
+        trigger.id == "state_changed"
+        and states[trigger.event.data.entity_id].domain == "update"
+        and trigger.event.data.entity_id in integration_entities("zwave_js")
+      }}
+
+# Calculate the list of entities with updates available in an action so it runs on each trigger.
+actions:
+- variables:
+    # This looks up the entity by first gathering the entity_id of all update entities in the 'on' state, then gathering
+    # the domain for each of these entities. We then zip the results, filter on the second item (the domain) being the
+    # ID of the ZWave JS Integration, and finally map out the first element in this array, which will be a list of
+    # entity_ids belonging to the ZWave JS Integration in the 'on' state.
+    #
+    # While it is more natural to filter all entities from the ZWave JS integration, filter down to update entities, and
+    # filter down to ones that are on. This should be slightly more effecient as there are likely to be an order of
+    # magnitude or two fewer update entites than total entities from ZWave JS.
+    entity_id: >-
+      {% set state_entities = states.update | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list %}
+      {% set config_entities = state_entities | map('config_entry_id') | map('config_entry_attr', 'domain') | list %}
+
+      {{ 
+        zip(state_entities, config_entities)
+        | selectattr('1', 'eq', 'zwave_js')
+        | map(attribute='0')
+        | list
+      }}
+
+sensor:
+  unique_id: z_wave_update_available
+  name: Z-Wave Devices with Available Updates
+  icon: mdi:update
+
+  state_class: measurement
+  unit_of_measurement: ''
+
+  attributes:
+    entity_id: '{{ entity_id }}'
+  state: '{{ entity_id | length }}'

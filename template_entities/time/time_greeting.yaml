@@ -1,0 +1,15 @@
+# This sensor calculates an appropriate "greeting" for dashboards or notifications.
+sensor:
+  unique_id: time_of_day_category
+  name: Time Of Day Category
+  icon: mdi:sun-clock
+  state: >-
+    {% if state_attr('sun.sun', 'rising') %}
+      morning
+    {% else %}
+      {% if is_state('sun.sun', 'above_horizon') and now() < time_until(as_datetime(state_attr('sun.sun', 'next_setting')) - timedelta(hours=1)) %}
+        afternoon
+      {% else %}
+        evening
+      {% endif %}
+    {% endif %}

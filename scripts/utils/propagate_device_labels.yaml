@@ -1,0 +1,38 @@
+alias: "Propagate Device Labels to Entities"
+description: >-
+  Copies all labels on the specified device to all entities that belong to this device.
+
+mode: parallel
+
+fields:
+  device_id:
+    description: The ID of the device. Must be a single device_id.
+    required: true
+
+sequence:
+- alias: "Discover Device Labels"
+  variables:
+    device_labels: '{{ labels(device_id) }}'
+
+- alias: "Ignore devices with 'Don't Propagate Labels' label"
+  if:
+  - condition: template
+    value_template: '{{ "don_t_propagate_labels" in device_labels }}'
+  then:
+  - stop: "Skipping device with 'Don't Propagate Labels'"
+
+# Note, these actions come from Spook: https://spook.boo/labels/
+- alias: "For Each Device Entity"
+  repeat:
+    for_each: '{{ device_entities(device_id) }}'
+    sequence:
+    - alias: "Clear Entity Labels"
+      action: homeassistant.remove_label_from_entity
+      data:
+        label_id: '{{ labels(repeat.item) }}'
+        entity_id: '{{ repeat.item }}'
+    - alias: 'Copy Labels to Entity'
+      action: homeassistant.add_label_to_entity
+      data:
+        label_id: '{{ device_labels }}'
+        entity_id: '{{ repeat.item }}'

@@ -1,0 +1,21 @@
+alias: "Sync All Device Labels to Entities"
+description: >-
+  Copies all labels on all devices to their entities.
+
+mode: single
+
+sequence:
+- repeat:
+    for_each: |-
+      {{
+        states 
+        | map(attribute='entity_id')
+        | map('device_id')
+        | unique
+        | reject('eq', None)
+        | list
+      }}
+    sequence:
+    - action: script.propagate_device_labels
+      data:
+        device_id: '{{ repeat.item }}'

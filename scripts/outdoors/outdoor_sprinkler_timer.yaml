@@ -1,0 +1,75 @@
+alias: "Run Zigbee Sprinkler for Duration"
+icon: mdi:sprinkler
+description: >-
+  Turns on the specified Sonoff Smmart Water Valve for the specified duration. The valve must already be in the "off"
+  state. The valve will be turned on using the timed-off feature to automatically close the valve even if Home Assistant
+  or the Zigbee Coordinator goes down. The script will wait for the valve to acknowledge this command and then wait for
+  it to close after the specified time has elapsed. This script targets exactly one valve.
+
+  See https://www.zigbee2mqtt.io/devices/SWV.html for details.
+
+# This is a utility script. Use mode parallel so multiple sprinklers can be controlled at the same time.
+mode: parallel
+
+fields:
+  friendly_name:
+    description: The z2m Friendly Name of the sprinkler entity.
+    example: front_yard_hose_valve
+    required: true
+    selector:
+      select:
+        options:
+        - front_yard_hose_valve
+        - east_side_yard_hose_valve
+        - back_yard_hose_valve
+        - west_side_yard_hose_valve
+  duration:
+    description: >-
+      How long to run the sprinkler for. Duration is transmitted with the turn_on command, but this script
+      waits until the sprinkler turns off again before returning.
+    default:
+      minutes: 5
+    required: true
+    selector:
+      duration:
+
+sequence:
+- alias: "Skip sprinkler if it is already on"
+  if:
+  - condition: template
+    value_template: "{{ not is_state('switch.' + friendly_name, 'off') }}"
+  then:
+  - stop: "Skipping sprinkler: not off"
+
+- alias: "Calculate Duration in Seconds"
+  variables:
+    duration_seconds: >-
+      {{
+        (duration['hours'] | default(0)) * 60 * 60 + (duration['minutes'] | default(0)) * 60 + (duration['seconds'] | default(0))
+      }}
+
+- alias: "Open the Valve"
+  action: mqtt.publish
+  metadata: {}
+  data:
+    topic: 'zigbee2mqtt/{{ friendly_name }}/set'
+    qos: 2 # Exactly Once semantics
+    payload: >-
+      {
+        "state": "ON",
+        "on_time": {{ duration_seconds | int }},
+        "off_wait_time": 1
+      }
+
+- alias: "Wait for the valve to acknowledge the command"
+  wait_template: "{{ is_state('switch.' + friendly_name, 'on') }}"
+  timeout:
+    minutes: 1
+  continue_on_timeout: false
+
+- alias: "Wait for the valve to turn off"
+  wait_template: "{{ is_state('switch.' + friendly_name, 'off') }}"
+  timeout:
+    # Wait for the duration plus one minute to give time for the broker to publish the state update
+    seconds: '{{ (duration_seconds | int) + 60 }}'
+  continue_on_timeout: false

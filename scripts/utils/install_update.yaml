@@ -1,0 +1,17 @@
+alias: "Install Update"
+description: >-
+  A small wrapper around the update.install action so you can install the update without waiting for the update to
+  complete by using the script.turn_on action to call this script, passing in the entity_id of the update entity.
+
+mode: parallel
+
+fields:
+  entity_id:
+    description: The ID of the update entity. Must be a single entity_id from the update domain.
+    required: true
+
+sequence:
+- alias: "Apply the Update"
+  action: update.install
+  target:
+    entity_id: '{{ entity_id }}'

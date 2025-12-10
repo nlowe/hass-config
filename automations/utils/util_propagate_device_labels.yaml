@@ -1,0 +1,20 @@
+id: util_propagate_device_labels
+alias: "Propagate Device Labels to Entities"
+description: >-
+  Whenever the set of labels changes for a device, copy all labels for the device to all entities that belong to the
+  device.
+
+triggers:
+- alias: "Device Configuration Updated"
+  trigger: event
+  event_type: device_registry_updated
+
+conditions:
+- alias: "Device Labels Changed"
+  condition: template
+  value_template: '{{ "changes" in trigger.event.data and "labels" in trigger.event.data.changes }}'
+
+actions:
+- action: script.propagate_device_labels
+  data:
+    device_id: '{{ trigger.event.data.device_id }}'

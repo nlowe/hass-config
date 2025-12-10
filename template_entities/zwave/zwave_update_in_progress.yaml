@@ -1,0 +1,66 @@
+# This sensor turns on whenever an update entity from the ZWave JS integration is in the 'on' state and has the state
+# attribute 'in_progress' set to True.
+
+triggers:
+# Update the sensor on any state change. We need to detect both an update starting and an update ending. We have to
+# defer filtering to conditions because there isn't a way to constrain an event trigger on a key being *present* in the
+# event_data without also specifying that key's value.
+- trigger: event
+  id: state_changed
+  event_type: state_changed
+
+# Also update whenever template entities get reloaded
+- trigger: event
+  id: event_template_reloaded
+  event_type: event_template_reloaded
+
+conditions:
+- condition: or
+  conditions:
+  - condition: trigger
+    id: event_template_reloaded
+
+  # Make sure this state change belongs to an 'update' entity from the ZWave JS Integration.
+  - condition: template
+    value_template: >-
+      {{
+        trigger.id == "state_changed"
+        and states[trigger.event.data.entity_id].domain == "update"
+        and trigger.event.data.entity_id in integration_entities("zwave_js")
+      }}
+
+# Calculate the currently updating entity in an action so it runs on each trigger
+actions:
+- variables:
+    # This looks up the entity by first gathering the entity_id of all update entities, then gathering the in_progress
+    # attribute for each entity, and finally gathering the domain for each of these entities. We then zip the results,
+    # filter on the third item (the domain) being the ID of the ZWave JS Integration, filter on the second item (the
+    # in_progress state attribute), take the first array (or an array containing a single 'none' by default), and finally map out the
+    # first element in this array, which will be either the entity_id of the first updating entity from the ZWave JS
+    # integration, or a 'none' if no entity is currently updating.
+    #
+    # While it is more natural to filter all entities from the ZWave JS integration, filter down to update entities, and
+    # filter down to one that is on and has the in_progress=True state attribute. This should be slightly more effecient
+    # as there are likely to be an order of magnitude or two fewer update entites than total entities from ZWave JS.
+    entity_id: >-
+      {% set state_entities = states.update | map(attribute='entity_id') | list %}
+      {% set update_attrs = state_entities | map('state_attr', 'in_progress') | list %}
+      {% set config_entities = state_entities | map('config_entry_id') | map('config_entry_attr', 'domain') | list %}
+
+      {{ 
+        zip(state_entities, update_attrs, config_entities)
+        | selectattr('2', 'eq', 'zwave_js')
+        | selectattr('1', 'true')
+        | map(attribute='0')
+        | first
+        | default(none)
+      }}
+
+binary_sensor:
+  unique_id: z_wave_update_in_progress
+  name: Z-Wave Device Update In-Progress
+  icon: mdi:update
+
+  attributes:
+    entity_id: '{{ entity_id }}'
+  state: '{{ entity_id is not none }}'
