@@ -4,3 +4,4 @@
   entities:
   - light.garage_exterior_lights
   - light.roof_soffit_lights
+  - light.outdoor_projector

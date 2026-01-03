@@ -1,0 +1,6 @@
+- platform: group
+  name: "Christmas Tree Lights"
+  unique_id: christmas_tree_lights
+  entities:
+  - light.christmas_tree_lights_top_outlet
+  - light.christmas_tree_lights_bottom_outlet
