@@ -1,0 +1,19 @@
+alias: "Sync Hot Tub Date/Time"
+icon: mdi:wrench-clock-outline
+description: Set the date and time of the RTC on the Hot Tub to the current local date and time.
+
+mode: single
+
+sequence:
+- alias: "Lookup Current Date/Time"
+  variables:
+    t: "{{ now().isoformat() }}"
+- alias: "Set Hot Tub RTC"
+  action: esphome.hot_tub_set_rtc
+  data:
+    year: "{{ (t | as_datetime).year | int }}"
+    month: "{{ (t | as_datetime).month | int }}"
+    day: "{{ (t | as_datetime).day | int }}"
+    hour: "{{ (t | as_datetime).hour | int }}"
+    minute: "{{ (t | as_datetime).minute | int }}"
+    second: "{{ (t | as_datetime).second | int }}"
