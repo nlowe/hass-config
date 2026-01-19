@@ -1,6 +1,4 @@
 .vscode/
 secrets.yaml
 
-# UI Managed
-automations.yaml
-scenes.yaml
+lint-fakes/

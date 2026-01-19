@@ -5,18 +5,19 @@ prometheus: !include prometheus.yaml
 homeassistant: !include homeassistant.yaml
 frontend: !include frontend.yaml
 
-automation: !include automations.yaml
-automation code: !include_dir_list automations/
+automation: !include ../automations.yaml
+# automation code: !include_dir_list automations/
 
 input_boolean: !include_dir_merge_named inputs/boolean/
 
 light: !include_dir_merge_list lights/
 cover: !include_dir_merge_list covers/
 
-scene: !include scenes.yaml
+scene: !include ../scenes.yaml
 scene code: !include_dir_list scenes/
 
-script: !include_dir_named scripts/
+script: !include ../scripts.yaml
+script code: !include_dir_named scripts/
 
 template: !include_dir_list template_entities/
 

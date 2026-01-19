@@ -3,25 +3,13 @@ HASS_VERSION := 2025.12.2
 .PHONY: all
 all: lint
 
-automations.yaml:
-	@touch automations.yaml
-
-scenes.yaml:
-	@touch scenes.yaml
-
-secrets.yaml: secrets.dummy.yaml
-	@cp secrets.dummy.yaml secrets.yaml
-
-.PHONY: fake-files-for-lint
-fake-files-for-lint: automations.yaml scenes.yaml secrets.yaml
-
 .PHONY: lint
-lint: fake-files-for-lint
+lint:
 	@docker run \
 		-i --rm \
-		-v $(shell pwd):/config:ro \
+		-v $(shell pwd):/config/hass-config-lint \
 		ghcr.io/home-assistant/home-assistant:$(HASS_VERSION) \
-			hass --script check_config --config /config
+			/config/hass-config-lint/lint.sh
 
 .PHONY: editorconfig-checker
 editorconfig-checker:
