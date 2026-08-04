@@ -2,59 +2,59 @@
 # this tracks desired update state and does not indicate that every device tracked by this sensor have an update
 # available.
 
-triggers:
-# Trigger any entity update that looks like an update. We have to defer filtering to conditions because there isn't a
-# way to constrain an event trigger on a key being *present* in the event_data without also specifying that key's value.
-- trigger: event
-  id: entity_registry_updated
-  event_type: entity_registry_updated
-  event_data:
-    action: update
+- triggers:
+  # Trigger any entity update that looks like an update. We have to defer filtering to conditions because there isn't a
+  # way to constrain an event trigger on a key being *present* in the event_data without also specifying that key's value.
+  - trigger: event
+    id: entity_registry_updated
+    event_type: entity_registry_updated
+    event_data:
+      action: update
 
-# Also update whenever template entities get reloaded.
-- trigger: event
-  id: event_template_reloaded
-  event_type: event_template_reloaded
-
-conditions:
-- condition: or
-  conditions:
-  - condition: trigger
+  # Also update whenever template entities get reloaded.
+  - trigger: event
     id: event_template_reloaded
+    event_type: event_template_reloaded
 
-  # This condition essentially checks that *some* labels changed for this entity in the state update event. We don't
-  # care what labels the entity currently has, as we need to also track the apply_z_wave_update label being removed from
-  # entities.
-  - condition: template
-    value_template: >-
-      {{
-        trigger.id == "entity_registry_updated"
-        and "changes" in trigger.event.data and "labels" in trigger.event.data.changes
-        and trigger.event.data.entity_id in integration_entities("zwave_js")
-      }}
+  conditions:
+  - condition: or
+    conditions:
+    - condition: trigger
+      id: event_template_reloaded
 
-# Calculate the list of entities with the apply_z_wave_update label in an action so it runs on each trigger.
-actions:
-- variables:
-    entity_id: >-
-      {{ 
-        label_entities('apply_z_wave_update')
-        | select('match', 'update')
-        | expand
-        | map(attribute='entity_id')
-        | list
-      }}
+    # This condition essentially checks that *some* labels changed for this entity in the state update event. We don't
+    # care what labels the entity currently has, as we need to also track the apply_z_wave_update label being removed from
+    # entities.
+    - condition: template
+      value_template: >-
+        {{
+          trigger.id == "entity_registry_updated"
+          and "changes" in trigger.event.data and "labels" in trigger.event.data.changes
+          and trigger.event.data.entity_id in integration_entities("zwave_js")
+        }}
 
-sensor:
-  unique_id: z_wave_update_apply_queue
-  name: Z-Wave Devices Configured to Install Updates When Able
-  icon: mdi:queue-first-in-last-out
+  # Calculate the list of entities with the apply_z_wave_update label in an action so it runs on each trigger.
+  actions:
+  - variables:
+      entity_id: >-
+        {{ 
+          label_entities('apply_z_wave_update')
+          | select('match', 'update')
+          | expand
+          | map(attribute='entity_id')
+          | list
+        }}
 
-  state_class: measurement
-  # TODO: Is there a way to specify a custom counter unit?
-  unit_of_measurement: ''
+  sensor:
+    unique_id: z_wave_update_apply_queue
+    name: Z-Wave Devices Configured to Install Updates When Able
+    icon: mdi:queue-first-in-last-out
 
-  attributes:
-    entity_id: '{{ entity_id }}'
-  state: >-
-    {{ entity_id | length }}
+    state_class: measurement
+    # TODO: Is there a way to specify a custom counter unit?
+    unit_of_measurement: ''
+
+    attributes:
+      entity_id: '{{ entity_id }}'
+    state: >-
+      {{ entity_id | length }}

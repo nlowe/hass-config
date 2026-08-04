@@ -1,0 +1,31 @@
+{% macro irrigation_zone_cycle_duration(friendly_name) %}
+{% if states('input_boolean.irrigation_' + friendly_name + '_enabled') | bool %}
+{{
+    (
+        (
+            (states('input_number.irrigation_dispense_volume') | float(0.0))
+            /
+            (
+                (states('input_number.irrigation_' + friendly_name + '_25m_volume') | float(0.0))
+                /
+                25
+            )
+        ) * 60
+    ) | round(0, "ceil")
+}}
+{% else %}
+0
+{% endif %}
+{% endmacro %}
+
+{% macro irrigation_zone_total_duration(friendly_name) %}
+{% if states('input_boolean.irrigation_' + friendly_name + '_enabled') | bool %}
+    {{
+        (states('sensor.irrigation_' + friendly_name + '_cycle_duration') | int(0))
+        *
+        (states('input_number.irrigation_dispense_cycles') | int(0))
+    }}
+{% else %}
+    0
+{% endif %}
+{% endmacro %}

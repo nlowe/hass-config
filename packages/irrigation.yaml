@@ -1,0 +1,687 @@
+# Custom above-ground ierrigation controller using a collection of Sonoff Valves.
+#
+# Each season, Zones are calibrated by running the zone for 25 minutes and recording the irrigation volume that gets
+# dispensed. From there, we can determine how long to run a zone for a given irrigation volume.
+#
+# Input helpers are provided to enable/disable individual zones as well as cycle count and delay between cycles for
+# cycle-and-soak irrigation.
+
+irrigation:
+
+  # Map zones to hose valve switches using groups to alias them, so valves can be swapped out as needed
+  switch:
+  - {platform: "group", name: "irrigation_back_east_side_yard",  entities: ["switch.back_east_side_yard_hose_valve"]}
+  - {platform: "group", name: "irrigation_back_yard",            entities: ["switch.back_yard_hose_valve"]}
+  - {platform: "group", name: "irrigation_front_east_side_yard", entities: ["switch.front_east_side_yard_hose_valve"]}
+  - {platform: "group", name: "irrigation_front_yard",           entities: ["switch.front_yard_hose_valve"]}
+  - {platform: "group", name: "irrigation_west_side_yard",       entities: ["switch.west_side_yard_hose_valve"]}
+
+  # Map zones to zwave topics and keys
+  input_text:
+    irrigation_back_east_side_yard_z2m_name:       { name: Back East Side Yard Zone z2m Name }
+    irrigation_back_yard_z2m_name:                 { name: Back Yard Zone z2m Name }
+    irrigation_front_east_side_yard_z2m_name:      { name: Front East Side Yard Zone z2m Name }
+    irrigation_front_yard_z2m_name:                { name: Front Yard Zone z2m Name }
+    irrigation_west_side_yard_z2m_name:            { name: West Side Yard Zone z2m Name }
+
+  # Helpers to enable/disable zones and irrigation automation
+  input_boolean:
+    irrigation_enabled: { name: Irrigation Enabled, icon: mdi:sprinkler }
+
+    irrigation_back_east_side_yard_enabled:  { name: Back East Side Yard Zone Enabled }
+    irrigation_back_yard_enabled:            { name: Back Yard Zone Enabled }
+    irrigation_front_east_side_yard_enabled: { name: Front East Side Yard Zone Enabled }
+    irrigation_front_yard_enabled:           { name: Front Yard Zone Enabled }
+    irrigation_west_side_yard_enabled:       { name: West Side Yard Zone Enabled }
+
+  # Calibration and cycle configuration inputs
+  input_number:
+    irrigation_back_east_side_yard_25m_volume:
+      name: Back East Side Yard 25 Minute Dispense Volume
+      icon: mdi:cup-water
+      unit_of_measurement: in
+      mode: box
+      min: 0
+      max: 2
+
+    irrigation_back_yard_25m_volume:
+      name: Back Yard Hose Valve 25 Minute Dispense Volume
+      icon: mdi:cup-water
+      unit_of_measurement: in
+      mode: box
+      min: 0
+      max: 2
+
+    irrigation_front_east_side_yard_25m_volume:
+      name: Front East Side Yard Hose Valve 25 Minute Dispense Volume
+      icon: mdi:cup-water
+      unit_of_measurement: in
+      mode: box
+      min: 0
+      max: 2
+
+    irrigation_front_yard_25m_volume:
+      name: Front Yard Hose Valve 25 Minute Dispense Volume
+      icon: mdi:cup-water
+      unit_of_measurement: in
+      mode: box
+      min: 0
+      max: 2
+
+    irrigation_west_side_yard_25m_volume:
+      name: West Side Yard Hose Valve 25 Minute Dispense Volume
+      icon: mdi:cup-water
+      unit_of_measurement: in
+      mode: box
+      min: 0
+      max: 2
+
+    irrigation_dispense_volume:
+      name: Irrigation Target Dispense Volume
+      icon: mdi:cup-water
+      unit_of_measurement: in
+      mode: box
+      min: 0
+      max: 2
+      step: 0.05
+
+    irrigation_dispense_cycles:
+      name: Irrigation Dispense Cycles
+      icon: mdi:counter
+      mode: box
+      min: 1
+      max: 5
+      step: 1
+
+    irrigation_cycle_delay_minutes:
+      name: Irrigation Cycle Delay (Minutes)
+      icon: mdi:counter
+      unit_of_measurement: m
+      mode: box
+      min: 1
+      max: 60
+      step: 1
+
+  # Template entities to compute desired irrigation settings
+  template:
+  # Given the volume calibration inputs, calculate the number of seconds the value needs to remain open to dispense the
+  # target volume defined in the input_number.irrigation_dispense_volume.
+  #
+  # Target Duration = Target Volume / (25 Minute Calibrated Volume / 25)
+  - sensor:
+    - name: "Irrigation: East Side Yard (Back Half): Cycle Duration"
+      default_entity_id: sensor.irrigation_back_east_side_yard_cycle_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_cycle_duration('back_east_side_yard') | int) }}
+      state: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {{ irrigation_zone_cycle_duration('back_east_side_yard') | int }}
+      availability: >-
+        {{
+          (states('input_number.irrigation_back_east_side_yard_25m_volume') | float(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+        }}
+    - name: "Irrigation: East Side Yard (Back Half): Total Duration"
+      default_entity_id: sensor.irrigation_back_east_side_yard_total_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_total_duration('back_east_side_yard') | int) }}
+      state: >-
+        {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+        {{ irrigation_zone_total_duration('back_east_side_yard') | int }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_back_east_side_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+        }}
+
+    - name: "Irrigation: Back Yard: Cycle Duration"
+      default_entity_id: sensor.irrigation_back_yard_cycle_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_cycle_duration('back_yard') | int) }}
+      state: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {{ irrigation_zone_cycle_duration('back_yard') | int }}
+      availability: >-
+        {{
+          (states('input_number.irrigation_back_yard_25m_volume') | float(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+        }}
+    - name: "Irrigation: Back Yard: Total Duration"
+      default_entity_id: sensor.irrigation_back_yard_total_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_total_duration('back_yard') | int) }}
+      state: >-
+        {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+        {{ irrigation_zone_total_duration('back_yard') | int }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_back_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+        }}
+
+    - name: "Irrigation: East Side Yard (Front Half): Cycle Duration"
+      default_entity_id: sensor.irrigation_front_east_side_yard_cycle_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_cycle_duration('front_east_side_yard') | int) }}
+      state: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {{ irrigation_zone_cycle_duration('front_east_side_yard') | int }}
+      availability: >-
+        {{
+          (states('input_number.irrigation_front_east_side_yard_25m_volume') | float(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+        }}
+    - name: "Irrigation: East Side Yard (Front Half): Total Duration"
+      default_entity_id: sensor.irrigation_front_east_side_yard_total_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_total_duration('front_east_side_yard') | int) }}
+      state: >-
+        {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+        {{ irrigation_zone_total_duration('front_east_side_yard') | int }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_front_east_side_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+        }}
+
+    - name: "Irrigation: Front Yard: Cycle Duration"
+      default_entity_id: sensor.irrigation_front_yard_cycle_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_cycle_duration('front_yard') | int) }}
+      state: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {{ irrigation_zone_cycle_duration('front_yard') | int }}
+      availability: >-
+        {{
+          (states('input_number.irrigation_front_yard_25m_volume') | float(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+        }}
+    - name: "Irrigation: Front Yard: Total Duration"
+      default_entity_id: sensor.irrigation_front_yard_total_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_total_duration('front_yard') | int) }}
+      state: >-
+        {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+        {{ irrigation_zone_total_duration('front_yard') | int }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_front_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+        }}
+
+    - name: "Irrigation: West Side Yard: Cycle Duration"
+      default_entity_id: sensor.irrigation_west_side_yard_cycle_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_cycle_duration('west_side_yard') | int) }}
+      state: >-
+          {% from 'irrigation.jinja' import irrigation_zone_cycle_duration %}
+          {{ irrigation_zone_cycle_duration('west_side_yard') | int }}
+      availability: >-
+        {{
+          (states('input_number.irrigation_west_side_yard_25m_volume') | float(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+        }}
+    - name: "Irrigation: West Side Yard: Total Duration"
+      default_entity_id: sensor.irrigation_west_side_yard_total_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{ seconds_to_duration_string(irrigation_zone_total_duration('west_side_yard') | int) }}
+      state: >-
+        {% from 'irrigation.jinja' import irrigation_zone_total_duration %}
+        {{ irrigation_zone_total_duration('west_side_yard') | int }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_west_side_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+        }}
+
+    - name: "Irrigation: Per-Cycle Cycle Duration"
+      default_entity_id: sensor.irrigation_per_cycle_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{
+            seconds_to_duration_string(
+              (states('sensor.irrigation_back_east_side_yard_cycle_duration') | int(0)) +
+              (states('sensor.irrigation_back_yard_cycle_duration') | int(0)) +
+              (states('sensor.irrigation_front_east_side_yard_cycle_duration') | int(0)) +
+              (states('sensor.irrigation_front_yard_cycle_duration') | int(0)) +
+              (states('sensor.irrigation_west_side_yard_cycle_duration') | int(0))
+            )
+          }}
+      state: >-
+          {{
+            (states('sensor.irrigation_back_east_side_yard_cycle_duration') | int(0)) +
+            (states('sensor.irrigation_back_yard_cycle_duration') | int(0)) +
+            (states('sensor.irrigation_front_east_side_yard_cycle_duration') | int(0)) +
+            (states('sensor.irrigation_front_yard_cycle_duration') | int(0)) +
+            (states('sensor.irrigation_west_side_yard_cycle_duration') | int(0))
+          }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_back_east_side_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_back_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_front_east_side_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_front_yard_cycle_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_west_side_yard_cycle_duration') | int(none) is not none)
+        }}
+    - name: "Irrigation: Total Duration"
+      default_entity_id: sensor.irrigation_total_duration
+      state_class: MEASUREMENT
+      unit_of_measurement: s
+      device_class: duration
+      attributes:
+        formatted: >-
+          {% from 'duration.jinja' import seconds_to_duration_string %}
+          {{
+            seconds_to_duration_string(
+              (states('sensor.irrigation_back_east_side_yard_total_duration') | int(0)) +
+              (states('sensor.irrigation_back_yard_total_duration') | int(0)) +
+              (states('sensor.irrigation_front_east_side_yard_total_duration') | int(0)) +
+              (states('sensor.irrigation_front_yard_total_duration') | int(0)) +
+              (states('sensor.irrigation_west_side_yard_total_duration') | int(0))
+              +
+              (
+                (states('input_number.irrigation_cycle_delay_minutes') | int(0) * 60)
+                *
+                (states('input_number.irrigation_dispense_cycles') | int(0) - 1)
+              )
+            )
+          }}
+      state: >-
+          {{
+            (states('sensor.irrigation_back_east_side_yard_total_duration') | int(0)) +
+            (states('sensor.irrigation_back_yard_total_duration') | int(0)) +
+            (states('sensor.irrigation_front_east_side_yard_total_duration') | int(0)) +
+            (states('sensor.irrigation_front_yard_total_duration') | int(0)) +
+            (states('sensor.irrigation_west_side_yard_total_duration') | int(0))
+            +
+            (
+              (states('input_number.irrigation_cycle_delay_minutes') | int(0) * 60)
+              *
+              (states('input_number.irrigation_dispense_cycles') | int(0) - 1)
+            )
+          }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_back_east_side_yard_total_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_back_yard_total_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_front_east_side_yard_total_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_front_yard_total_duration') | int(none) is not none)
+          and
+          (states('sensor.irrigation_west_side_yard_total_duration') | int(none) is not none)
+          and
+          (states('input_number.irrigation_cycle_delay_minutes') | int(none) is not none)
+          and
+          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+        }}
+
+    - name: "Irrigation: Target Start Time"
+      default_entity_id: sensor.irrigation_target_start_time
+      device_class: TIMESTAMP
+      state: >-
+        {% set sunrise = (states('sensor.sun_next_rising') | as_datetime | as_local) %}
+        {% set irrigation_total_duration = (states('sensor.irrigation_total_duration') | int) %}
+        {% set irrigation_start_cutoff = sunrise - timedelta(hours=3) %}
+
+        {# First, check if we can get in the full duration prior to sunrise #}
+        {% if (sunrise - timedelta(seconds=irrigation_total_duration)) > irrigation_start_cutoff %}
+          {{ (sunrise - timedelta(seconds=irrigation_total_duration)).isoformat() }}
+        {% else %}
+          {# Otherwise, just start at the cutoff #}
+          {{ irrigation_start_cutoff.isoformat() }}
+        {% endif %}
+      availability: >-
+        {{
+          states('sensor.irrigation_total_duration') | int(none) is not none
+        }}
+
+    - name: "Irrigation: Duration Too Long"
+      default_entity_id: sensor.irrigation_duration_too_long
+      state: >-
+        {{ (states('sensor.irrigation_total_duration') | int) > 6 * 60 * 60 }}
+      availability: >-
+        {{
+          states('sensor.irrigation_total_duration') | int(none) is not none
+        }}
+
+    - name: "Irrigation: End Time"
+      default_entity_id: sensor.irrigation_end_time
+      device_class: TIMESTAMP
+      state: >-
+        {% set irrigation_target_start_time = (states('sensor.irrigation_target_start_time') | as_datetime | as_local) %}
+        {% set irrigation_total_duration = (states('sensor.irrigation_total_duration') | int) %}
+
+        {{ (irrigation_target_start_time + timedelta(seconds=irrigation_total_duration)).isoformat() }}
+      availability: >-
+        {{
+          (states('sensor.irrigation_target_start_time') | as_datetime is not none)
+          and
+          (states('sensor.irrigation_total_duration') | int(none) is not none)
+        }}
+
+  script:
+    run_zigbee_sprinkler_for_duration:
+      alias: "Run Zigbee Sprinkler for Duration"
+      icon: mdi:sprinkler
+      description: >-
+        Turns on the specified Sonoff Smmart Water Valve for the specified duration. The valve must already be in the
+        "off" state. The valve will be turned on using the timed-off feature to automatically close the valve even if
+        Home Assistant or the Zigbee Coordinator goes down.
+
+        The script will wait for the valve to acknowledge this command and then wait for it to close after the specified
+        time has elapsed. This script targets exactly one valve.
+
+      mode: single
+
+      fields:
+        friendly_name:
+          description: The zone to run
+          example: front_yard
+          required: true
+          selector:
+            select:
+              options:
+              - front_yard
+              - front_east_side_yard
+              - back_east_side_yard
+              - back_yard
+              - west_side_yard
+        duration:
+          description: >-
+            How long to run the sprinkler for. Duration is transmitted with the turn_on command, but this script
+            waits until the sprinkler turns off again before returning.
+          default:
+            minutes: 5
+          required: true
+          selector:
+            duration:
+
+      sequence:
+      - alias: "Skip sprinkler if it is already on"
+        if:
+        - condition: template
+          value_template: "{{ not is_state('switch.irrigation_' + friendly_name, 'off') }}"
+        then:
+        - stop: "Skipping sprinkler: not off"
+
+      - alias: "Calculate Duration in Seconds"
+        variables:
+          duration_seconds: >-
+            {{
+              (duration['hours'] | default(0)) * 60 * 60 + (duration['minutes'] | default(0)) * 60 + (duration['seconds'] | default(0))
+            }}
+
+      - alias: "Check for non-zero Duration"
+        if:
+        - condition: template
+          value_template: '{{ duration_seconds }} <= 0'
+        then:
+        - stop: "Skipping {{friendly_name}}: Duration not greater than zero: {{ duration_seconds }}"
+
+      - alias: "Open the Valve"
+        action: mqtt.publish
+        metadata: {}
+        data:
+          topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_z2m_name') }}/set"
+          qos: 2 # Exactly Once semantics
+          payload: >-
+            {
+              "state": "ON",
+              "on_time": {{ duration_seconds | int }},
+              "off_wait_time": 1
+            }
+
+      - alias: "Wait for the valve to acknowledge the command"
+        action: retry.action
+        data:
+          action: mqtt.publish
+          topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_z2m_name') }}/get"
+          qos: 1 # At Least Once semantics
+          payload: >-
+            {
+              "state": ""
+            }
+          validation: "[[ is_state('{{ 'switch.irrigation_' + friendly_name }}', 'on') ]]"
+
+      - alias: "Notify of valve open"
+        action: notify.nlowe
+        data:
+          title: Hose Valve On
+          message: >-
+            {% from 'duration.jinja' import seconds_to_duration_string %}
+            {{ friendly_name }} irrigation started. It will run for {{ seconds_to_duration_string(duration_seconds) }}.
+
+      - alias: "Sleep while the valve is running"
+        delay: "{{ duration_seconds | int }}"
+
+      - alias: "Wait for the valve to turn off"
+        action: retry.action
+        data:
+          action: mqtt.publish
+          topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_name') }}/get"
+          qos: 1 # At Least Once semantics
+          payload: >-
+            {
+              "state": ""
+            }
+          validation: "[[ is_state('{{ 'switch.irrigation_' + friendly_name }}', 'off') ]]"
+
+    run_zigbee_sprinkler_cycle:
+      alias: "Run Zigbee Sprinkler Irrigation Cycle"
+      icon: mdi:sprinkler
+      description: >-
+        Turns on the specified Sonoff Smmart Water Valve for the computed duration for an irrigation cycle.
+
+        The valve must already be in the "off" state. The valve will be turned on using the timed-off feature to
+        automatically close the valve even if Home Assistant or the Zigbee Coordinator goes down.
+
+        The script will wait for the valve to acknowledge this command and then wait for it to close after the specified
+        time has elapsed. This script targets exactly one valve.
+
+      mode: single
+
+      fields:
+        friendly_name:
+          description: The zone to run
+          example: front_yard
+          required: true
+          selector:
+            select:
+              options:
+              - front_yard
+              - front_east_side_yard
+              - back_east_side_yard
+              - back_yard
+              - west_side_yard
+
+      sequence:
+      - action: script.run_zigbee_sprinkler_for_duration
+        data:
+          friendly_name: '{{ friendly_name }}'
+          duration:
+            seconds: '{{ states("sensor.irrigation_" + friendly_name + "_cycle_duration") | int(0) }}'
+
+    run_full_irrigation_cycle:
+      alias: "Run Full Irrigation Cycle"
+      icon: mdi:sprinkler
+      description: >-
+        Runs a single irrigation cycle on all enabled zones.
+
+      mode: single
+
+      sequence:
+      - alias: "For Each Zone"
+        repeat:
+          for_each:
+          - front_yard
+          - front_east_side_yard
+          - back_east_side_yard
+          - back_yard
+          - west_side_yard
+          sequence:
+          - alias: "If Zone Enabled"
+            if:
+            - condition: template
+              value_template: '{{ states("input_boolean.irrigation_" + repeat.item + "_enabled") }}'
+            then:
+            - alias: "Run Zone Cycle"
+              action: script.run_zigbee_sprinkler_cycle
+              data:
+                friendly_name: '{{ repeat.item }}'
+
+  automation:
+  - alias: Hose Valve Turned Off Notifications
+    id: hose_valve_notificationss
+    description: >-
+      Send a notification whenever an irrigation valve turns off
+
+    mode: queued
+    max: 10
+
+    triggers:
+    - alias: When a hose valve cycles
+      trigger: state
+      entity_id:
+        - switch.irrigation_back_east_side_yard
+        - switch.irrigation_back_yard
+        - switch.irrigation_front_east_side_yard
+        - switch.irrigation_front_yard
+        - switch.irrigation_west_side_yard
+      id: valve_cycle
+      from:
+        - "on"
+      to:
+        - "off"
+
+    actions:
+    - action: notify.nlowe
+      data:
+        title: Hose Valve Off
+        message: "{{ (trigger.entity_id).removeprefix('switch.irrigation_') }} turned off."
+
+  - alias: "Water The Lawn"
+    id: water_the_lawn
+
+    description: >-
+      Water the lawn according to the current irrigation settings. This will dispense the specified amount of water
+      over the specified number of cycles, waiting the configured cycle delay between cycles.
+
+    mode: single
+
+    triggers:
+    - alias: "At the calculated irrigation start time"
+      trigger: time
+      at:
+        entity_id: sensor.irrigation_target_start_time
+
+    conditions:
+    - alias: "Irrigation Enabled"
+      condition: state
+      entity_id: input_boolean.irrigation_enabled
+      state: "on"
+
+    actions:
+    - alias: "Abort if irrigation disabled"
+      if:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: input_boolean.irrigation_enabled
+          state: "on"
+      then:
+      - stop: "Aborting: Irrigation Not Enabled"
+
+    - repeat:
+        count: '{{ states("input_number.irrigation_dispense_cycles") }}'
+        sequence:
+        - alias: "Run Irrigation Cycle"
+          action: script.run_full_irrigation_cycle
+
+        - alias: "For all but the last cycle"
+          if:
+          - condition: template
+            value_template: '{{ not repeat.last }}'
+          then:
+          - alias: "Wait for the configured cycle delay"
+            delay:
+              minutes: '{{ states("input_number.irrigation_cycle_delay_minutes") }}'

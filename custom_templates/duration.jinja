@@ -1,0 +1,10 @@
+{% macro seconds_to_duration_string(s) %}
+{% set v = s | int(0) %}
+{% if v > (60 * 60) %}
+    {{ v | timestamp_custom("%Hh%Mm%Ss", false) }}
+{% elif v > 60 %}
+    {{ v | timestamp_custom("%Mm%Ss", false) }}
+{% else %}
+    {{ v }}s
+{% endif %}
+{% endmacro %}

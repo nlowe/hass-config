@@ -1,0 +1,5 @@
+platform: group
+name: "nlowe"
+services:
+- action: mobile_app_pixel_9_pro_xl
+- action: mobile_app_galaxy_watch6_classic_h8cf
