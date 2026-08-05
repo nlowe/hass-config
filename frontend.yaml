@@ -3,7 +3,7 @@ themes:
     # More colors for the energy panel
     # https://github.com/home-assistant/frontend/discussions/12397#discussioncomment-7231515
     #
-    # Colors from the grafana classic palette: 
+    # Colors from the grafana classic palette:
     # https://github.com/grafana/grafana/blob/b67b9e3c5e828b686b915145c56e0b71f3596334/packages/grafana-data/src/themes/createVisualizationColors.ts#L225
     energy-grid-consumption-color-0: "#7EB26D"
     energy-grid-consumption-color-1: "#EAB839"

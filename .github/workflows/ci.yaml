@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Check Config
-        run: make
+        run: make lint
 
       - uses: editorconfig-checker/action-editorconfig-checker@main
       - run: editorconfig-checker

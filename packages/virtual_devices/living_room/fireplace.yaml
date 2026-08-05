@@ -103,7 +103,7 @@ virtual_devices_living_room_fireplace:
     - light:
       - name: "Living Room Fireplace"
         unique_id: living_room_fireplace
-        state: "{{ states('input_boolean.living_room_fireplace_state') }}" 
+        state: "{{ states('input_boolean.living_room_fireplace_state') }}"
 
         turn_off:
         - action: input_boolean.turn_off

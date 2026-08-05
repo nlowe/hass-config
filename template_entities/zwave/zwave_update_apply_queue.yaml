@@ -37,7 +37,7 @@
   actions:
   - variables:
       entity_id: >-
-        {{ 
+        {{
           label_entities('apply_z_wave_update')
           | select('match', 'update')
           | expand

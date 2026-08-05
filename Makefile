@@ -1,7 +1,7 @@
 HASS_VERSION := 2026.7.2
 
 .PHONY: all
-all: lint
+all: lint editorconfig-checker
 
 .PHONY: lint
 lint:

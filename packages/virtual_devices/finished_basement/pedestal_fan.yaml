@@ -69,7 +69,7 @@ virtual_devices_basement_desk_pedestal_fan:
         # Home Assistant seems to turn the fan off by setting the speed to 0.
         # TODO: Can we just remove the on/off scripts?
         - if: "{{ percentage == 0 }}"
-          then: 
+          then:
           - parallel: *turn_off_commands
           - stop: "Fan turned off"
 

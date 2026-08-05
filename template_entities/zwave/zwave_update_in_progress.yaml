@@ -47,7 +47,7 @@
         {% set update_attrs = state_entities | map('state_attr', 'in_progress') | list %}
         {% set config_entities = state_entities | map('config_entry_id') | map('config_entry_attr', 'domain') | list %}
 
-        {{ 
+        {{
           zip(state_entities, update_attrs, config_entities)
           | selectattr('2', 'eq', 'zwave_js')
           | selectattr('1', 'true')
