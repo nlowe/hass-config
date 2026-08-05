@@ -1,0 +1,20 @@
+symbols:
+- SPCX  # SpaceX
+- VTTSX # Vanguard Target Retirement 2060 (SpaceX 401k)
+- ^GSPC # S&P 500
+- ^DJI  # Dow Jones
+- ^IXIC # NASDAQ
+
+scan_interval:
+  seconds: 30
+
+show_trending_icon: true
+
+include_dividend_values: true
+include_fifty_day_values: true
+include_fifty_two_week_values: true
+include_post_values: true
+include_pre_values: true
+include_two_hundred_day_values: true
+
+show_off_market_values: true
