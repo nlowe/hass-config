@@ -1,0 +1,6 @@
+- platform: group
+  name: "Living Room Accent Lights"
+  unique_id: living_room_accent_lights
+  entities:
+  - light.living_room_side_table_light
+  - light.living_room_floor_light

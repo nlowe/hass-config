@@ -1,0 +1,6 @@
+- platform: group
+  name: "Master Bedroom Accent Lights"
+  unique_id: master_bedroom_accent_lights
+  entities:
+  - light.master_bedroom_night_stand_light
+  - light.master_bedroom_floor_light

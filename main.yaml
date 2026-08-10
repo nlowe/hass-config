@@ -1,5 +1,4 @@
 default_config:
-http: !include http.yaml
 prometheus: !include prometheus.yaml
 
 homeassistant: !include homeassistant.yaml
