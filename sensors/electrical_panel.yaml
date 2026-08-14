@@ -1,0 +1,315 @@
+# - platform: group
+#   name: "$name Total Current"
+#   unique_id: "$id_total_current"
+#   state_class: measurement
+#   unit_of_measurement: A
+#   device_class: current
+#   type: sum
+#   entities:
+#   - "sensor.$id_a_phase_current"
+#   - "sensor.$id_b_phase_current"
+# - platform: group
+#   name: "$name Total Daily Energy"
+#   unique_id: "$id_total_daily_energy"
+#   state_class: total_increasing
+#   unit_of_measurement: Wh
+#   device_class: energy
+#   type: sum
+#   entities:
+#   - "sensor.$id_a_phase_daily_energy"
+#   - "sensor.$id_b_phase_daily_energy"
+# - platform: group
+#   name: "$name Total Power"
+#   unique_id: "$id_total_power"
+#   state_class: measurement
+#   unit_of_measurement: W
+#   device_class: power
+#   type: sum
+#   entities:
+#   - "sensor.$id_a_phase_power"
+#   - "sensor.$id_b_phase_power"
+
+- platform: group
+  name: "Dryer Total Current"
+  unique_id: "vue3a_dryer_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3a_dryer_a_phase_current"
+  - "sensor.vue3a_dryer_b_phase_current"
+- platform: group
+  name: "Dryer Total Daily Energy"
+  unique_id: "vue3a_dryer_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3a_dryer_a_phase_daily_energy"
+  - "sensor.vue3a_dryer_b_phase_daily_energy"
+- platform: group
+  name: "Dryer Total Power"
+  unique_id: "vue3a_dryer_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3a_dryer_a_phase_power"
+  - "sensor.vue3a_dryer_b_phase_power"
+
+- platform: group
+  name: "Wall Oven Total Current"
+  unique_id: "vue3a_wall_oven_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3a_wall_oven_a_phase_current"
+  - "sensor.vue3a_wall_oven_b_phase_current"
+- platform: group
+  name: "Wall Oven Total Daily Energy"
+  unique_id: "vue3a_wall_oven_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3a_wall_oven_a_phase_daily_energy"
+  - "sensor.vue3a_wall_oven_b_phase_daily_energy"
+- platform: group
+  name: "Wall Oven Total Power"
+  unique_id: "vue3a_wall_oven_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3a_wall_oven_a_phase_power"
+  - "sensor.vue3a_wall_oven_b_phase_power"
+
+- platform: group
+  name: "AC Total Current"
+  unique_id: "vue3b_ac_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3b_ac_a_phase_current"
+  - "sensor.vue3b_ac_b_phase_current"
+- platform: group
+  name: "AC Total Daily Energy"
+  unique_id: "vue3b_ac_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3b_ac_a_phase_daily_energy"
+  - "sensor.vue3b_ac_b_phase_daily_energy"
+- platform: group
+  name: "AC Total Power"
+  unique_id: "vue3b_ac_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3b_ac_a_phase_power"
+  - "sensor.vue3b_ac_b_phase_power"
+
+- platform: group
+  name: "Cooktop Total Current"
+  unique_id: "vue3b_cooktop_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3b_cooktop_a_phase_current"
+  - "sensor.vue3b_cooktop_b_phase_current"
+- platform: group
+  name: "Cooktop Total Daily Energy"
+  unique_id: "vue3b_cooktop_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3b_cooktop_a_phase_daily_energy"
+  - "sensor.vue3b_cooktop_b_phase_daily_energy"
+- platform: group
+  name: "Cooktop Total Power"
+  unique_id: "vue3b_cooktop_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3b_cooktop_a_phase_power"
+  - "sensor.vue3b_cooktop_b_phase_power"
+
+- platform: group
+  name: "Hot Tub Total Current"
+  unique_id: "vue3b_hot_tub_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3b_hot_tub_a_phase_current"
+  - "sensor.vue3b_hot_tub_b_phase_current"
+- platform: group
+  name: "Hot Tub Total Daily Energy"
+  unique_id: "vue3b_hot_tub_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3b_hot_tub_a_phase_daily_energy"
+  - "sensor.vue3b_hot_tub_b_phase_daily_energy"
+- platform: group
+  name: "Hot Tub Total Power"
+  unique_id: "vue3b_hot_tub_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3b_hot_tub_a_phase_power"
+  - "sensor.vue3b_hot_tub_b_phase_power"
+
+- platform: group
+  name: "Car Charger Total Current"
+  unique_id: "vue3c_car_charger_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3c_car_charger_a_phase_current"
+  - "sensor.vue3c_car_charger_b_phase_current"
+- platform: group
+  name: "Car Charger Total Daily Energy"
+  unique_id: "vue3c_car_charger_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3c_car_charger_a_phase_daily_energy"
+  - "sensor.vue3c_car_charger_b_phase_daily_energy"
+- platform: group
+  name: "Car Charger Total Power"
+  unique_id: "vue3c_car_charger_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3c_car_charger_a_phase_power"
+  - "sensor.vue3c_car_charger_b_phase_power"
+
+- platform: group
+  name: "Server Rack #1 Total Current"
+  unique_id: "vue3c_server_rack_1_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_1_a_phase_current"
+  - "sensor.vue3c_server_rack_1_b_phase_current"
+- platform: group
+  name: "Server Rack #1 Total Daily Energy"
+  unique_id: "vue3c_server_rack_1_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_1_a_phase_daily_energy"
+  - "sensor.vue3c_server_rack_1_b_phase_daily_energy"
+- platform: group
+  name: "Server Rack #1 Total Power"
+  unique_id: "vue3c_server_rack_1_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_1_a_phase_power"
+  - "sensor.vue3c_server_rack_1_b_phase_power"
+
+- platform: group
+  name: "Server Rack #2 + Emporia Total Current"
+  unique_id: "vue3c_server_rack_2_emporia_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_2_emporia_a_phase_current"
+  - "sensor.vue3c_server_rack_2_emporia_b_phase_current"
+- platform: group
+  name: "Server Rack #2 + Emporia Total Total Daily Energy"
+  unique_id: "vue3c_server_rack_2_emporia_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_2_emporia_a_phase_daily_energy"
+  - "sensor.vue3c_server_rack_2_emporia_b_phase_daily_energy"
+- platform: group
+  name: "Server Rack #2 + Emporia Total Total Power"
+  unique_id: "vue3c_server_rack_2_emporia_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_2_emporia_a_phase_power"
+  - "sensor.vue3c_server_rack_2_emporia_b_phase_power"
+
+- platform: group
+  name: "Server Rack Total Current"
+  unique_id: "vue3c_server_rack_total_current"
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_1_a_phase_current"
+  - "sensor.vue3c_server_rack_1_b_phase_current"
+  - "sensor.vue3c_server_rack_2_emporia_a_phase_current"
+  - "sensor.vue3c_server_rack_2_emporia_b_phase_current"
+- platform: group
+  name: "Server Rack Total Daily Energy"
+  unique_id: "vue3c_server_rack_total_daily_energy"
+  state_class: total_increasing
+  unit_of_measurement: Wh
+  device_class: energy
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_1_a_phase_daily_energy"
+  - "sensor.vue3c_server_rack_1_b_phase_daily_energy"
+  - "sensor.vue3c_server_rack_2_emporia_a_phase_daily_energy"
+  - "sensor.vue3c_server_rack_2_emporia_b_phase_daily_energy"
+- platform: group
+  name: "Server Rack Total Power"
+  unique_id: "vue3c_server_rack_total_power"
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  type: sum
+  entities:
+  - "sensor.vue3c_server_rack_1_a_phase_power"
+  - "sensor.vue3c_server_rack_1_b_phase_power"
+  - "sensor.vue3c_server_rack_2_emporia_a_phase_power"
+  - "sensor.vue3c_server_rack_2_emporia_b_phase_power"
