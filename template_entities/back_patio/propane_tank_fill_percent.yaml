@@ -1,0 +1,50 @@
+- sensor:
+    name: "Pizza Oven Propane Tank: Fill Percent (Raw)"
+    default_entity_id: sensor.pizza_oven_propane_tank_tank_percent_raw
+    unique_id: sensor.pizza_oven_propane_tank_tank_percent_raw
+    icon: mdi:propane-tank-outline
+    state_class: MEASUREMENT
+    unit_of_measurement: "%"
+    state: >-
+      {# https://github.com/esphome/esphome/blob/dev/esphome/components/mopeka_pro_check/sensor.py#L50 #}
+      {% set fill_min_mm = 38.0 %}
+      {% set fill_max_mm = 254.0 %}
+      {% set level_mm = states('sensor.pizza_oven_propane_tank_tank_level') | float(fill_min_mm / 25.4) * 25.4 %}
+      {{ (((level_mm - fill_min_mm) * 100) / (fill_max_mm - fill_min_mm)) }}
+    availability: "{{ has_value('sensor.pizza_oven_propane_tank_tank_level') }}"
+
+- sensor:
+    name: "Pizza Oven Propane Tank: Fill Percent"
+    default_entity_id: sensor.pizza_oven_propane_tank_tank_percent
+    unique_id: sensor.pizza_oven_propane_tank_tank_percent
+    icon: mdi:propane-tank-outline
+    state_class: MEASUREMENT
+    unit_of_measurement: "%"
+    state: >-
+      {{ states('sensor.pizza_oven_propane_tank_tank_percent_raw') | float(0.0) | round(2) }}
+    availability: "{{ has_value('sensor.pizza_oven_propane_tank_tank_percent_raw') }}"
+
+- sensor:
+    name: "Pizza Oven Propane Tank: Estimated Remaining (Raw)"
+    default_entity_id: sensor.pizza_oven_propane_tank_estimated_remaining_raw
+    unique_id: sensor.pizza_oven_propane_tank_estimated_remaining_raw
+    icon: mdi:propane-tank-outline
+    state_class: MEASUREMENT
+    device_class: VOLUME_STORAGE
+    unit_of_measurement: "gal"
+    state: >-
+      {# https://www.amerigas.com/about-propane/propane-tank-sizes #}
+      {{ (states('sensor.pizza_oven_propane_tank_tank_percent_raw') | float(0.0) / 100) * 4.6 }}
+    availability: "{{ has_value('sensor.pizza_oven_propane_tank_tank_percent_raw') }}"
+
+- sensor:
+    name: "Pizza Oven Propane Tank: Estimated Remaining"
+    default_entity_id: sensor.pizza_oven_propane_tank_estimated_remaining
+    unique_id: sensor.pizza_oven_propane_tank_estimated_remaining
+    icon: mdi:propane-tank-outline
+    state_class: MEASUREMENT
+    device_class: VOLUME_STORAGE
+    unit_of_measurement: "gal"
+    state: >-
+      {{ states('sensor.pizza_oven_propane_tank_estimated_remaining_raw') | float(0.0) | round(2) }}
+    availability: "{{ has_value('sensor.pizza_oven_propane_tank_estimated_remaining_raw') }}"
