@@ -12,7 +12,6 @@ input_number: !include_dir_merge_named inputs/number/
 
 light: !include_dir_merge_list lights/
 cover: !include_dir_merge_list covers/
-sensor: !include_dir_merge_list sensors/
 
 notify: !include_dir_list notify/
 

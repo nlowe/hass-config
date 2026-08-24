@@ -1,4 +1,4 @@
-HASS_VERSION := 2026.8.1
+HASS_VERSION := 2026.8.3
 
 .PHONY: all
 all: lint editorconfig-checker
