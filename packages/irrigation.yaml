@@ -602,7 +602,7 @@ irrigation:
           - alias: "If Zone Enabled"
             if:
             - condition: template
-              value_template: '{{ states("input_boolean.irrigation_" + repeat.item + "_enabled") }}'
+              value_template: '{{ is_state("input_boolean.irrigation_" + repeat.item + "_enabled", "on") }}'
             then:
             - alias: "Run Zone Cycle"
               action: script.run_zigbee_sprinkler_cycle
