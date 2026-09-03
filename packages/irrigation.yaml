@@ -538,7 +538,7 @@ irrigation:
         action: retry.action
         data:
           action: mqtt.publish
-          topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_name') }}/get"
+          topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_z2m_name') }}/get"
           qos: 1 # At Least Once semantics
           payload: >-
             {
