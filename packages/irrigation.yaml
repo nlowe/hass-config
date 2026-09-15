@@ -3,6 +3,12 @@
 # Each season, Zones are calibrated by running the zone for 25 minutes and recording the irrigation volume that gets
 # dispensed. From there, we can determine how long to run a zone for a given irrigation volume.
 #
+# "Seeding" mode runs each zone throughout the day based on the seeding mode:
+#
+# * Pre-Germination:  Water 4x per day, Approximately  5 minutes for the fastest zone
+# * Post-Germination: Water 3x per day, Approximately  7 minutes for the fastest zone
+# * Maturing:         Water 2x per day, Approximately 10 minutes for the fastest zone
+#
 # Input helpers are provided to enable/disable individual zones as well as cycle count and delay between cycles for
 # cycle-and-soak irrigation.
 
@@ -15,6 +21,15 @@ irrigation:
   - {platform: "group", name: "irrigation_front_east_side_yard", entities: ["switch.front_east_side_yard_hose_valve"]}
   - {platform: "group", name: "irrigation_front_yard",           entities: ["switch.front_yard_hose_valve"]}
   - {platform: "group", name: "irrigation_west_side_yard",       entities: ["switch.west_side_yard_hose_valve"]}
+  # And another to detect whether any valve is active
+  - platform: "group"
+    name: "irrigation_any_active"
+    entities:
+    - "switch.back_east_side_yard_hose_valve"
+    - "switch.back_yard_hose_valve"
+    - "switch.front_east_side_yard_hose_valve"
+    - "switch.front_yard_hose_valve"
+    - "switch.west_side_yard_hose_valve"
 
   # Map zones to zwave topics and keys
   input_text:
@@ -102,13 +117,159 @@ irrigation:
       max: 60
       step: 1
 
+  input_select:
+    irrigation_seeding_mode:
+      name: Irrigation Seeding Mode
+      icon: mdi:sprout
+      options:
+      - Disabled
+      - Pre-Germination
+      - Post-Germination
+      - Maturing
+
+  # Irrigation Schedules for seeding. Annoyingly, there isn't a template schedule integration so we need several
+  # schedules. There are three schedules that correspond to the selected mode by input_select.irrigation_seeding_mode:
+  #
+  # * Pre-Germination:  Water 4x per day, Approximately  5 minutes for the fastest zone
+  # * Post-Germination: Water 3x per day, Approximately  7 minutes for the fastest zone
+  # * Maturing:         Water 2x per day, Approximately 10 minutes for the fastest zone
+  schedule:
+    irrigation_seeding_pre_germination:
+      name: "Irrigation Seeding: Pre-Germination Schedule"
+      icon: mdi:sprout
+      monday: &irrigation_seeding_pre_germination
+      - { from: "11:00", to: "11:30" }
+      - { from: "15:00", to: "15:30" }
+      - { from: "07:00", to: "07:30" }
+      - { from: "19:00", to: "19:30" }
+      tuesday: *irrigation_seeding_pre_germination
+      wednesday: *irrigation_seeding_pre_germination
+      thursday: *irrigation_seeding_pre_germination
+      friday: *irrigation_seeding_pre_germination
+      saturday: *irrigation_seeding_pre_germination
+      sunday: *irrigation_seeding_pre_germination
+    irrigation_seeding_post_germination:
+      name: "Irrigation Seeding: Post-Germination Schedule"
+      icon: mdi:sprout-outline
+      monday: &irrigation_seeding_post_germination
+      - { from: "13:00", to: "13:30" }
+      - { from: "19:00", to: "19:30" }
+      - { from: "07:00", to: "07:30" }
+      tuesday: *irrigation_seeding_post_germination
+      wednesday: *irrigation_seeding_post_germination
+      thursday: *irrigation_seeding_post_germination
+      friday: *irrigation_seeding_post_germination
+      saturday: *irrigation_seeding_post_germination
+      sunday: *irrigation_seeding_post_germination
+    irrigation_seeding_maturing:
+      name: "Irrigation Seeding: Maturing Schedule"
+      icon: mdi:grass
+      monday: &irrigation_seeding_maturing
+      - { from: "07:00", to: "07:30" }
+      - { from: "15:00", to: "15:30" }
+      tuesday: *irrigation_seeding_maturing
+      wednesday: *irrigation_seeding_maturing
+      thursday: *irrigation_seeding_maturing
+      friday: *irrigation_seeding_maturing
+      saturday: *irrigation_seeding_maturing
+      sunday: *irrigation_seeding_maturing
+
   # Template entities to compute desired irrigation settings
   template:
-  # Given the volume calibration inputs, calculate the number of seconds the value needs to remain open to dispense the
-  # target volume defined in the input_number.irrigation_dispense_volume.
-  #
-  # Target Duration = Target Volume / (25 Minute Calibrated Volume / 25)
   - sensor:
+    # For pre-germination mode, calculate the volume of water to dispense such that the fastest zone runs for
+    # approximately 5 minutes.
+    - name: "Irrigation: Seeding: Pre-Germination Dispense Volume"
+      default_entity_id: sensor.irrigation_seeding_pre_germination_dispense_volume
+      state_class: MEASUREMENT
+      unit_of_measurement: in
+      device_class: PRECIPITATION
+      state: >-
+        {{
+          expand([
+            'input_number.irrigation_back_east_side_yard_25m_volume',
+            'input_number.irrigation_back_yard_25m_volume',
+            'input_number.irrigation_front_east_side_yard_25m_volume',
+            'input_number.irrigation_front_yard_25m_volume',
+            'input_number.irrigation_west_side_yard_25m_volume'
+          ]) | map(attribute="state") | map("float", default=0.0) | sort(reverse=True) | first / 25 * 5
+        }}
+      availability: >-
+        {{
+          (has_value('input_number.irrigation_back_east_side_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_back_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_front_east_side_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_front_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_west_side_yard_25m_volume'))
+        }}
+    # For post-germination mode, calculate the volume of water to dispense such that the fastest zone runs for
+    # approximately 7 minutes.
+    - name: "Irrigation: Seeding: Post-Germination Dispense Volume"
+      default_entity_id: sensor.irrigation_seeding_post_germination_dispense_volume
+      state_class: MEASUREMENT
+      unit_of_measurement: in
+      device_class: PRECIPITATION
+      state: >-
+        {{
+          expand([
+            'input_number.irrigation_back_east_side_yard_25m_volume',
+            'input_number.irrigation_back_yard_25m_volume',
+            'input_number.irrigation_front_east_side_yard_25m_volume',
+            'input_number.irrigation_front_yard_25m_volume',
+            'input_number.irrigation_west_side_yard_25m_volume'
+          ]) | map(attribute="state") | map("float", default=0.0) | sort(reverse=True) | first / 25 * 7
+        }}
+      availability: >-
+        {{
+          (has_value('input_number.irrigation_back_east_side_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_back_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_front_east_side_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_front_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_west_side_yard_25m_volume'))
+        }}
+    # For maturing mode, calculate the volume of water to dispense such that the fastest zone runs for
+    # approximately 10 minutes.
+    - name: "Irrigation: Seeding: Maturing Dispense Volume"
+      default_entity_id: sensor.irrigation_seeding_maturing_dispense_volume
+      state_class: MEASUREMENT
+      unit_of_measurement: in
+      device_class: PRECIPITATION
+      state: >-
+        {{
+          expand([
+            'input_number.irrigation_back_east_side_yard_25m_volume',
+            'input_number.irrigation_back_yard_25m_volume',
+            'input_number.irrigation_front_east_side_yard_25m_volume',
+            'input_number.irrigation_front_yard_25m_volume',
+            'input_number.irrigation_west_side_yard_25m_volume'
+          ]) | map(attribute="state") | map("float", default=0.0) | sort(reverse=True) | first / 25 * 10
+        }}
+      availability: >-
+        {{
+          (has_value('input_number.irrigation_back_east_side_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_back_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_front_east_side_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_front_yard_25m_volume'))
+          and
+          (has_value('input_number.irrigation_west_side_yard_25m_volume'))
+        }}
+
+    # Given the volume calibration inputs, calculate the number of seconds the value needs to remain open to dispense the
+    # target volume defined in the input_number.irrigation_dispense_volume (or, if seeding mode is enabled,
+    # sensor.irrigation_seeding_mode_dispense_volume).
+    #
+    # Target Duration = Target Volume / (25 Minute Calibrated Volume / 25)
     - name: "Irrigation: East Side Yard (Back Half): Cycle Duration"
       default_entity_id: sensor.irrigation_back_east_side_yard_cycle_duration
       state_class: MEASUREMENT
@@ -304,6 +465,58 @@ irrigation:
           (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
         }}
 
+    - name: "Irrigation: Seeding Mode: Dispense Volume"
+      default_entity_id: sensor.irrigation_seeding_mode_dispense_volume
+      state_class: MEASUREMENT
+      unit_of_measurement: in
+      device_class: PRECIPITATION
+      state: >-
+        {% if is_state('input_select.irrigation_seeding_mode', 'Disabled') %}
+        0
+        {% else %}
+        {% set mode_to_volume = {
+            'Pre-Germination': 'sensor.irrigation_seeding_pre_germination_dispense_volume',
+            'Post-Germination': 'sensor.irrigation_seeding_post_germination_dispense_volume',
+            'Maturing': 'sensor.irrigation_seeding_maturing_dispense_volume' } %}
+        {{ states(mode_to_volume[states('input_select.irrigation_seeding_mode')]) }}
+        {% endif %}
+      availability: >-
+        {{
+          has_value('input_select.irrigation_seeding_mode')
+          and
+          has_value('sensor.irrigation_seeding_pre_germination_dispense_volume')
+          and
+          has_value('sensor.irrigation_seeding_post_germination_dispense_volume')
+          and
+          has_value('sensor.irrigation_seeding_maturing_dispense_volume')
+        }}
+    - name: "Irrigation: Seeding Mode: Cycles"
+      default_entity_id: sensor.irrigation_seeding_mode_cycles
+      state_class: MEASUREMENT
+      state: >-
+        {% if is_state('input_select.irrigation_seeding_mode', 'Disabled') %}
+        0
+        {% else %}
+        {% set mode_to_cycles = {
+            'Pre-Germination': 4,
+            'Post-Germination': 3,
+            'Maturing': 2 } %}
+        {{ mode_to_cycles[states('input_select.irrigation_seeding_mode')] }}
+        {% endif %}
+      availability: >-
+        {{ has_value('input_select.irrigation_seeding_mode') }}
+    - name: "Irrigation: Seeding Mode: Next Cycle"
+      default_entity_id: sensor.irrigation_seeding_mode_next_cycle
+      device_class: TIMESTAMP
+      state: >-
+        {% set mode_to_volume = {
+            'Pre-Germination': 'schedule.irrigation_seeding_pre_germination',
+            'Post-Germination': 'schedule.irrigation_seeding_post_germination',
+            'Maturing': 'schedule.irrigation_seeding_maturing' } %}
+        {{ state_attr(mode_to_volume[states('input_select.irrigation_seeding_mode')], 'next_event') }}
+      availability: >-
+        {{ is_state('input_select.irrigation_seeding_mode', ['Pre-Germination', 'Post-Germination', 'Maturing']) }}
+
     - name: "Irrigation: Per-Cycle Cycle Duration"
       default_entity_id: sensor.irrigation_per_cycle_duration
       state_class: MEASUREMENT
@@ -360,7 +573,13 @@ irrigation:
               (
                 (states('input_number.irrigation_cycle_delay_minutes') | int(0) * 60)
                 *
-                (states('input_number.irrigation_dispense_cycles') | int(0) - 1)
+                (
+                  iif(
+                      is_state('input_select.irrigation_seeding_mode', 'Disabled'),
+                      states('input_number.irrigation_dispense_cycles'),
+                      states('sensor.irrigation_seeding_mode_cycles')
+                  ) | int(0) - 1
+                )
               )
             )
           }}
@@ -375,7 +594,13 @@ irrigation:
             (
               (states('input_number.irrigation_cycle_delay_minutes') | int(0) * 60)
               *
-              (states('input_number.irrigation_dispense_cycles') | int(0) - 1)
+              (
+                iif(
+                    is_state('input_select.irrigation_seeding_mode', 'Disabled'),
+                    states('input_number.irrigation_dispense_cycles'),
+                    states('sensor.irrigation_seeding_mode_cycles')
+                ) | int(0) - 1
+              )
             )
           }}
       availability: >-
@@ -415,6 +640,7 @@ irrigation:
           states('sensor.irrigation_total_duration') | int(none) is not none
         }}
 
+    # TODO: Update to handle seeding mode
     - name: "Irrigation: Duration Too Long"
       default_entity_id: sensor.irrigation_duration_too_long
       state: >-
@@ -483,6 +709,13 @@ irrigation:
           value_template: "{{ not is_state('switch.irrigation_' + friendly_name, 'off') }}"
         then:
         - stop: "Skipping sprinkler: not off"
+      - alias: "Abort if another sprinkler is already on"
+        if:
+        - condition: state
+          entity_id: switch.irrigation_any_active
+          state: "on"
+        then:
+        - stop: "Skipping sprinkler: Another sprinkler is already running, please stop it first."
 
       - alias: "Calculate Duration in Seconds"
         variables:
@@ -659,6 +892,10 @@ irrigation:
       condition: state
       entity_id: input_boolean.irrigation_enabled
       state: "on"
+    - alias: "Seeding Mode Disabled"
+      condition: state
+      entity_id: input_select.irrigation_seeding_mode
+      state: "Disabled"
 
     actions:
     - alias: "Abort if irrigation disabled"
@@ -670,6 +907,15 @@ irrigation:
           state: "on"
       then:
       - stop: "Aborting: Irrigation Not Enabled"
+    - alias: "Abort if seeding mode enabled"
+      if:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: input_select.irrigation_seeding_mode
+          state: "Disabled"
+      then:
+      - stop: "Aborting: Seeding Mode Configured"
 
     - repeat:
         count: '{{ states("input_number.irrigation_dispense_cycles") }}'
@@ -685,3 +931,69 @@ irrigation:
           - alias: "Wait for the configured cycle delay"
             delay:
               minutes: '{{ states("input_number.irrigation_cycle_delay_minutes") }}'
+
+  - alias: "Water The Lawn (Seeding Mode)"
+    id: water_the_lawn_seeding_mode
+
+    description: >-
+      Water the lawn according to the current irrigation settings in seeding mode. This will dispense the specified
+      amount of water over the specified number of cycles based on the current seeding mode, on a schedule based on this
+      mode.
+
+    # We trigger on all schedules, which may have overlapping events. Use queued mode to handle all 3 schedules, only
+    # one of which will actually run due to conditions.
+    mode: queued
+    max: 3
+
+    triggers:
+    - alias: "Pre-Germination: Schedule Event"
+      trigger: schedule.block_started
+      id: "Pre-Germination"
+      target:
+        entity_id: schedule.irrigation_seeding_pre_germination
+    - alias: "Post-Germination: Schedule Event"
+      trigger: schedule.block_started
+      id: "Post-Germination"
+      target:
+        entity_id: schedule.irrigation_seeding_post_germination
+    - alias: "Maturing: Schedule Event"
+      trigger: schedule.block_started
+      id: "Maturing"
+      target:
+        entity_id: schedule.irrigation_seeding_maturing
+
+    conditions:
+    - alias: "Irrigation Enabled"
+      condition: state
+      entity_id: input_boolean.irrigation_enabled
+      state: "on"
+    - alias: "Seeding Mode Matches Schedule"
+      condition: template
+      value_template: "{{ trigger.id == states('input_select.irrigation_seeding_mode') }}"
+
+    actions:
+    - alias: "Abort manual triggers"
+      if:
+      - condition: template
+        value_template: "{{ trigger.id is not defined }}"
+      then:
+      - stop: "Do not use manual triggers. If you want to run a manual cycle, use the script instead."
+    - alias: "Abort if irrigation disabled"
+      if:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: input_boolean.irrigation_enabled
+          state: "on"
+      then:
+      - stop: "Aborting: Irrigation Not Enabled"
+    - alias: "Abort if seeding mode disabled"
+      if:
+      - condition: state
+        entity_id: input_select.irrigation_seeding_mode
+        state: "Disabled"
+      then:
+      - stop: "Aborting: Seeding Mode Disabled"
+
+    - alias: "Run Irrigation Cycle"
+      action: script.run_full_irrigation_cycle

@@ -3,7 +3,13 @@
 {{
     (
         (
-            (states('input_number.irrigation_dispense_volume') | float(0.0))
+            (
+                iif(
+                    is_state('input_select.irrigation_seeding_mode', 'Disabled'),
+                    states('input_number.irrigation_dispense_volume'),
+                    states('sensor.irrigation_seeding_mode_dispense_volume')
+                ) | float(0.0)
+            )
             /
             (
                 (states('input_number.irrigation_' + friendly_name + '_25m_volume') | float(0.0))
@@ -14,7 +20,7 @@
     ) | round(0, "ceil")
 }}
 {% else %}
-0
+    0
 {% endif %}
 {% endmacro %}
 
@@ -23,7 +29,13 @@
     {{
         (states('sensor.irrigation_' + friendly_name + '_cycle_duration') | int(0))
         *
-        (states('input_number.irrigation_dispense_cycles') | int(0))
+        (
+            iif(
+                is_state('input_select.irrigation_seeding_mode', 'Disabled'),
+                states('input_number.irrigation_dispense_cycles'),
+                states('sensor.irrigation_seeding_mode_cycles')
+            ) | int(0)
+        )
     }}
 {% else %}
     0
