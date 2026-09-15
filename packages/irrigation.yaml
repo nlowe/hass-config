@@ -130,9 +130,9 @@ irrigation:
   # Irrigation Schedules for seeding. Annoyingly, there isn't a template schedule integration so we need several
   # schedules. There are three schedules that correspond to the selected mode by input_select.irrigation_seeding_mode:
   #
-  # * Pre-Germination:  Water 4x per day, Approximately  5 minutes for the fastest zone
-  # * Post-Germination: Water 3x per day, Approximately  7 minutes for the fastest zone
-  # * Maturing:         Water 2x per day, Approximately 10 minutes for the fastest zone
+  # * Pre-Germination:  Water 4x per day, every day. About 0.25" per day, ~5 minutes for the fastest zone per cycle.
+  # * Post-Germination: Water 3x per day, every other day. about 0.3" per day, ~7 minutes for the fastest zone per cycle.
+  # * Maturing:         Water 2x per day, three times per week. about 0.28" per day, ~10 minutes for the fastest zone per cycle.
   schedule:
     irrigation_seeding_pre_germination:
       name: "Irrigation Seeding: Pre-Germination Schedule"
@@ -155,11 +155,8 @@ irrigation:
       - { from: "13:00", to: "13:30" }
       - { from: "19:00", to: "19:30" }
       - { from: "07:00", to: "07:30" }
-      tuesday: *irrigation_seeding_post_germination
       wednesday: *irrigation_seeding_post_germination
-      thursday: *irrigation_seeding_post_germination
       friday: *irrigation_seeding_post_germination
-      saturday: *irrigation_seeding_post_germination
       sunday: *irrigation_seeding_post_germination
     irrigation_seeding_maturing:
       name: "Irrigation Seeding: Maturing Schedule"
@@ -167,12 +164,8 @@ irrigation:
       monday: &irrigation_seeding_maturing
       - { from: "07:00", to: "07:30" }
       - { from: "15:00", to: "15:30" }
-      tuesday: *irrigation_seeding_maturing
       wednesday: *irrigation_seeding_maturing
-      thursday: *irrigation_seeding_maturing
-      friday: *irrigation_seeding_maturing
       saturday: *irrigation_seeding_maturing
-      sunday: *irrigation_seeding_maturing
 
   # Template entities to compute desired irrigation settings
   template:
