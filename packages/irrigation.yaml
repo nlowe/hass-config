@@ -577,7 +577,7 @@ irrigation:
                   iif(
                       is_state('input_select.irrigation_seeding_mode', 'Disabled'),
                       states('input_number.irrigation_dispense_cycles'),
-                      states('sensor.irrigation_seeding_mode_cycles')
+                      1
                   ) | int(0) - 1
                 )
               )
