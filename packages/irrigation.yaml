@@ -138,9 +138,9 @@ irrigation:
       name: "Irrigation Seeding: Pre-Germination Schedule"
       icon: mdi:sprout
       monday: &irrigation_seeding_pre_germination
+      - { from: "07:00", to: "07:30" }
       - { from: "11:00", to: "11:30" }
       - { from: "15:00", to: "15:30" }
-      - { from: "07:00", to: "07:30" }
       - { from: "19:00", to: "19:30" }
       tuesday: *irrigation_seeding_pre_germination
       wednesday: *irrigation_seeding_pre_germination
@@ -152,9 +152,9 @@ irrigation:
       name: "Irrigation Seeding: Post-Germination Schedule"
       icon: mdi:sprout-outline
       monday: &irrigation_seeding_post_germination
+      - { from: "07:00", to: "07:30" }
       - { from: "13:00", to: "13:30" }
       - { from: "19:00", to: "19:30" }
-      - { from: "07:00", to: "07:30" }
       wednesday: *irrigation_seeding_post_germination
       friday: *irrigation_seeding_post_germination
       sunday: *irrigation_seeding_post_germination
