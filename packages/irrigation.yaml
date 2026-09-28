@@ -757,6 +757,8 @@ irrigation:
             {%- from 'duration.jinja' import seconds_to_duration_string -%}
             {{- friendly_name }} irrigation started. It will run for {{- seconds_to_duration_string(duration_seconds) -}}.
           data:
+            ttl: 0
+            priority: high
             notification_icon: mdi:sprinkler
             channel: Irrigation
             chronometer: true
@@ -876,6 +878,8 @@ irrigation:
         title: Hose Valve Off
         message: "{{ (trigger.entity_id).removeprefix('switch.irrigation_') }} turned off."
         data:
+          ttl: 0
+          priority: high
           channel: Irrigation
 
   - alias: "Water The Lawn"
