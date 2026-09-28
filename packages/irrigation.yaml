@@ -754,8 +754,16 @@ irrigation:
         data:
           title: Hose Valve On
           message: >-
-            {% from 'duration.jinja' import seconds_to_duration_string %}
-            {{ friendly_name }} irrigation started. It will run for {{ seconds_to_duration_string(duration_seconds) }}.
+            {%- from 'duration.jinja' import seconds_to_duration_string -%}
+            {{- friendly_name }} irrigation started. It will run for {{- seconds_to_duration_string(duration_seconds) -}}.
+          data:
+            notification_icon: mdi:sprinkler
+            channel: Irrigation
+            chronometer: true
+            when: >-
+              {{ (utcnow() | as_timestamp + duration_seconds) | round(precision=0, method="floor") }}
+            timeout: >-
+              {{ duration_seconds | int }}
 
       - alias: "Sleep while the valve is running"
         delay: "{{ duration_seconds | int }}"
@@ -771,6 +779,9 @@ irrigation:
               "state": ""
             }
           validation: "[[ is_state('{{ 'switch.irrigation_' + friendly_name }}', 'off') ]]"
+
+      - alias: "Wait for group sensor to update"
+        wait_template: "{{ is_state('switch.irrigation_any_active', 'off')}}"
 
     run_zigbee_sprinkler_cycle:
       alias: "Run Zigbee Sprinkler Irrigation Cycle"
@@ -864,6 +875,8 @@ irrigation:
       data:
         title: Hose Valve Off
         message: "{{ (trigger.entity_id).removeprefix('switch.irrigation_') }} turned off."
+        data:
+          channel: Irrigation
 
   - alias: "Water The Lawn"
     id: water_the_lawn
