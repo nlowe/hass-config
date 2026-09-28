@@ -1,0 +1,6 @@
+# z2m doesn't include a device_class or state_class for these sensors. Add them as a customization so we can include
+# them in the Energy dashboard.
+"sensor.*_valve_*_irrigation_volume":
+  device_class: water
+  state_class: total_increasing
+  icon: mdi:cup-water

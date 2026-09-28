@@ -4,6 +4,8 @@ latitude: !secret latitude
 longitude: !secret longitude
 elevation: !secret elevation
 
+customize_glob: !include_dir_merge_named customize/glob/
+
 country: US
 language: en
 currency: USD
