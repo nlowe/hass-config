@@ -15,5 +15,7 @@ time_zone: America/New_York
 unit_system: us_customary
 
 external_url: !secret remote_base
+# Make internal_url match for ESP Home API components that advertise the Home Assistant "address"
+internal_url: !secret remote_base
 
 packages: !include_dir_merge_named packages/
