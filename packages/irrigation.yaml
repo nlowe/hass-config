@@ -720,7 +720,7 @@ irrigation:
       - alias: "Check for non-zero Duration"
         if:
         - condition: template
-          value_template: '{{ duration_seconds }} <= 0'
+          value_template: '{{ duration_seconds <= 0 }}'
         then:
         - stop: "Skipping {{friendly_name}}: Duration not greater than zero: {{ duration_seconds }}"
 

@@ -12,7 +12,7 @@ sequence:
 - alias: "Turn on the Ceiling Fan Light"
   action: "light.turn_{{ light_mode }}"
   target:
-    entity_id: light.master_bedroom_ceiling_fan
+    entity_id: light.master_bedroom_ceiling_fan_light
 - alias: "Turn on the Fans"
   parallel:
   - action: fan.turn_on
