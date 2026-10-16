@@ -278,9 +278,9 @@ irrigation:
           {{ irrigation_zone_cycle_duration('back_east_side_yard') | int }}
       availability: >-
         {{
-          (states('input_number.irrigation_back_east_side_yard_25m_volume') | float(none) is not none)
+          has_value('input_number.irrigation_back_east_side_yard_25m_volume')
           and
-          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+          has_value('input_number.irrigation_dispense_volume')
         }}
     - name: "Irrigation: East Side Yard (Back Half): Total Duration"
       default_entity_id: sensor.irrigation_back_east_side_yard_total_duration
@@ -297,9 +297,9 @@ irrigation:
         {{ irrigation_zone_total_duration('back_east_side_yard') | int }}
       availability: >-
         {{
-          (states('sensor.irrigation_back_east_side_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_back_east_side_yard_cycle_duration')
           and
-          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+          has_value('input_number.irrigation_dispense_cycles')
         }}
 
     - name: "Irrigation: Back Yard: Cycle Duration"
@@ -317,9 +317,9 @@ irrigation:
           {{ irrigation_zone_cycle_duration('back_yard') | int }}
       availability: >-
         {{
-          (states('input_number.irrigation_back_yard_25m_volume') | float(none) is not none)
+          has_value('input_number.irrigation_back_yard_25m_volume')
           and
-          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+          has_value('input_number.irrigation_dispense_volume')
         }}
     - name: "Irrigation: Back Yard: Total Duration"
       default_entity_id: sensor.irrigation_back_yard_total_duration
@@ -336,9 +336,9 @@ irrigation:
         {{ irrigation_zone_total_duration('back_yard') | int }}
       availability: >-
         {{
-          (states('sensor.irrigation_back_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_back_yard_cycle_duration')
           and
-          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+          has_value('input_number.irrigation_dispense_cycles')
         }}
 
     - name: "Irrigation: East Side Yard (Front Half): Cycle Duration"
@@ -356,9 +356,9 @@ irrigation:
           {{ irrigation_zone_cycle_duration('front_east_side_yard') | int }}
       availability: >-
         {{
-          (states('input_number.irrigation_front_east_side_yard_25m_volume') | float(none) is not none)
+          has_value('input_number.irrigation_front_east_side_yard_25m_volume')
           and
-          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+          has_value('input_number.irrigation_dispense_volume')
         }}
     - name: "Irrigation: East Side Yard (Front Half): Total Duration"
       default_entity_id: sensor.irrigation_front_east_side_yard_total_duration
@@ -375,9 +375,9 @@ irrigation:
         {{ irrigation_zone_total_duration('front_east_side_yard') | int }}
       availability: >-
         {{
-          (states('sensor.irrigation_front_east_side_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_front_east_side_yard_cycle_duration')
           and
-          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+          has_value('input_number.irrigation_dispense_cycles')
         }}
 
     - name: "Irrigation: Front Yard: Cycle Duration"
@@ -395,9 +395,9 @@ irrigation:
           {{ irrigation_zone_cycle_duration('front_yard') | int }}
       availability: >-
         {{
-          (states('input_number.irrigation_front_yard_25m_volume') | float(none) is not none)
+          has_value('input_number.irrigation_front_yard_25m_volume')
           and
-          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+          has_value('input_number.irrigation_dispense_volume')
         }}
     - name: "Irrigation: Front Yard: Total Duration"
       default_entity_id: sensor.irrigation_front_yard_total_duration
@@ -414,9 +414,9 @@ irrigation:
         {{ irrigation_zone_total_duration('front_yard') | int }}
       availability: >-
         {{
-          (states('sensor.irrigation_front_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_front_yard_cycle_duration')
           and
-          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+          has_value('input_number.irrigation_dispense_cycles')
         }}
 
     - name: "Irrigation: West Side Yard: Cycle Duration"
@@ -434,9 +434,9 @@ irrigation:
           {{ irrigation_zone_cycle_duration('west_side_yard') | int }}
       availability: >-
         {{
-          (states('input_number.irrigation_west_side_yard_25m_volume') | float(none) is not none)
+          has_value('input_number.irrigation_west_side_yard_25m_volume')
           and
-          (states('input_number.irrigation_dispense_volume') | float(none) is not none)
+          has_value('input_number.irrigation_dispense_volume')
         }}
     - name: "Irrigation: West Side Yard: Total Duration"
       default_entity_id: sensor.irrigation_west_side_yard_total_duration
@@ -453,9 +453,9 @@ irrigation:
         {{ irrigation_zone_total_duration('west_side_yard') | int }}
       availability: >-
         {{
-          (states('sensor.irrigation_west_side_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_west_side_yard_cycle_duration')
           and
-          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+          has_value('input_number.irrigation_dispense_cycles')
         }}
 
     - name: "Irrigation: Seeding Mode: Dispense Volume"
@@ -537,15 +537,15 @@ irrigation:
           }}
       availability: >-
         {{
-          (states('sensor.irrigation_back_east_side_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_back_east_side_yard_cycle_duration')
           and
-          (states('sensor.irrigation_back_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_back_yard_cycle_duration')
           and
-          (states('sensor.irrigation_front_east_side_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_front_east_side_yard_cycle_duration')
           and
-          (states('sensor.irrigation_front_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_front_yard_cycle_duration')
           and
-          (states('sensor.irrigation_west_side_yard_cycle_duration') | int(none) is not none)
+          has_value('sensor.irrigation_west_side_yard_cycle_duration')
         }}
     - name: "Irrigation: Total Duration"
       default_entity_id: sensor.irrigation_total_duration
@@ -598,19 +598,19 @@ irrigation:
           }}
       availability: >-
         {{
-          (states('sensor.irrigation_back_east_side_yard_total_duration') | int(none) is not none)
+          has_value('sensor.irrigation_back_east_side_yard_total_duration')
           and
-          (states('sensor.irrigation_back_yard_total_duration') | int(none) is not none)
+          has_value('sensor.irrigation_back_yard_total_duration')
           and
-          (states('sensor.irrigation_front_east_side_yard_total_duration') | int(none) is not none)
+          has_value('sensor.irrigation_front_east_side_yard_total_duration')
           and
-          (states('sensor.irrigation_front_yard_total_duration') | int(none) is not none)
+          has_value('sensor.irrigation_front_yard_total_duration')
           and
-          (states('sensor.irrigation_west_side_yard_total_duration') | int(none) is not none)
+          has_value('sensor.irrigation_west_side_yard_total_duration')
           and
-          (states('input_number.irrigation_cycle_delay_minutes') | int(none) is not none)
+          has_value('input_number.irrigation_cycle_delay_minutes')
           and
-          (states('input_number.irrigation_dispense_cycles') | int(none) is not none)
+          has_value('input_number.irrigation_dispense_cycles')
         }}
 
     - name: "Irrigation: Target Start Time"
@@ -655,7 +655,7 @@ irrigation:
         {{
           (states('sensor.irrigation_target_start_time') | as_datetime is not none)
           and
-          (states('sensor.irrigation_total_duration') | int(none) is not none)
+          has_value('sensor.irrigation_total_duration')
         }}
 
   script:
