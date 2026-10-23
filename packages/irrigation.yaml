@@ -741,13 +741,16 @@ irrigation:
         action: retry.action
         data:
           action: mqtt.publish
-          topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_z2m_name') }}/get"
-          qos: 1 # At Least Once semantics
-          payload: >-
-            {
-              "state": ""
-            }
           validation: "[[ is_state('{{ 'switch.irrigation_' + friendly_name }}', 'on') ]]"
+          retries: 300
+          backoff: 1
+          inner_data:
+            topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_z2m_name') }}/get"
+            qos: 1 # At Least Once semantics
+            payload: >-
+              {
+                "state": ""
+              }
 
       - alias: "Notify of valve open"
         action: notify.nlowe
@@ -772,15 +775,19 @@ irrigation:
 
       - alias: "Wait for the valve to turn off"
         action: retry.action
+
         data:
           action: mqtt.publish
-          topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_z2m_name') }}/get"
-          qos: 1 # At Least Once semantics
-          payload: >-
-            {
-              "state": ""
-            }
           validation: "[[ is_state('{{ 'switch.irrigation_' + friendly_name }}', 'off') ]]"
+          retries: 300
+          backoff: 1
+          inner_data:
+            topic: "zigbee2mqtt/{{ states('input_text.irrigation_' + friendly_name + '_z2m_name') }}/get"
+            qos: 1 # At Least Once semantics
+            payload: >-
+              {
+                "state": ""
+              }
 
       - alias: "Wait for group sensor to update"
         wait_template: "{{ is_state('switch.irrigation_any_active', 'off')}}"
